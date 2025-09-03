@@ -489,8 +489,8 @@ export function TailoredJobAccordion({
   if (resume.is_base_resume) return null;
 
   const title = job?.position_title || "Target Job";
-  const company = job?.company_name;
-
+// AFTER
+const company = job?.company ?? (job as any)?.company_name ?? 'Unknown Company';
   const handleDelete = async () => {
     if (!resume.job_id) return;
     
