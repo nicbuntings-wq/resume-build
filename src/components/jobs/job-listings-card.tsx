@@ -163,7 +163,6 @@ export function JobListingsCard() {
                     <SelectItem value="part_time">⌛ Part Time</SelectItem>
                     <SelectItem value="co_op">🤝 Co-op</SelectItem>
                     <SelectItem value="internship">🎓 Internship</SelectItem>
-                    <SelectItem value="contract">🧩 Contract</SelectItem>
                   </SelectContent>
                 </Select>
                 <div className="absolute inset-0 -z-10 bg-gradient-to-r from-purple-500/20 to-rose-500/20 blur opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
