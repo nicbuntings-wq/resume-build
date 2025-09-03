@@ -1,5 +1,6 @@
 'use client';
 
+import { cn, normalizeWorkLocation } from "@/lib/utils";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -245,6 +246,7 @@ export function CreateTailoredResumeDialog({
       setCurrentStep('formatting');
 
       // 2. Create job in database and get ID
+      formattedJobListing.work_location = normalizeWorkLocation(formattedJobListing.work_location);
       const jobEntry = await createJob(formattedJobListing);
       if (!jobEntry?.id) throw new Error("Failed to create job entry");
 
