@@ -8,9 +8,17 @@ import { z } from "zod";
 import { JobListingParams } from "./schema";
 
 /**
+ * A type that extends the job schema with both possible company fields
+ */
+type SimplifiedJobInput = z.infer<typeof simplifiedJobSchema> & {
+  company?: string;
+  company_name?: string;
+};
+
+/**
  * Create a new job posting
  */
-export async function createJob(jobListing: z.infer<typeof simplifiedJobSchema>) {
+export async function createJob(jobListing: SimplifiedJobInput) {
   const supabase = await createClient();
   const { data: { user }, error: userError } = await supabase.auth.getUser();
 
@@ -18,17 +26,15 @@ export async function createJob(jobListing: z.infer<typeof simplifiedJobSchema>)
     throw new Error('User not authenticated');
   }
 
-  // Handle company field gracefully
-  const company =
-    // @ts-expect-error tolerate older schema for now
-    (jobListing as any).company ??
-    // @ts-expect-error tolerate older schema for now
-    (jobListing as any).company_name ??
+  // Prefer `company`, fallback to `company_name`
+  const company: string =
+    jobListing.company ??
+    jobListing.company_name ??
     "Unknown Company";
 
   const jobData: Partial<Job> = {
     user_id: user.id,
-    company, // ✅ matches DB column
+    company,
     position_title: jobListing.position_title ?? "Untitled Role",
     job_url: jobListing.job_url ?? null,
     description: jobListing.description ?? null,
@@ -65,13 +71,11 @@ export async function deleteJob(jobId: string): Promise<void> {
     throw new Error('User not authenticated');
   }
 
-  // Find resumes referencing this job
   const { data: affectedResumes } = await supabase
     .from('resumes')
     .select('id')
     .eq('job_id', jobId);
 
-  // Delete the job
   const { error: deleteError } = await supabase
     .from('jobs')
     .delete()
@@ -82,7 +86,6 @@ export async function deleteJob(jobId: string): Promise<void> {
     throw new Error('Failed to delete job');
   }
 
-  // Revalidate affected pages
   affectedResumes?.forEach((resume) => {
     revalidatePath(`/resumes/${resume.id}`);
   });
