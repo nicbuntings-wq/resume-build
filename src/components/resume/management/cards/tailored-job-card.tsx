@@ -22,16 +22,14 @@ import { AccordionItem, AccordionTrigger, AccordionContent } from "@/components/
 import { BriefcaseIcon } from "lucide-react";
 import { formatJobListing } from "@/utils/actions/jobs/ai";
 
-type LegacyJob = { company_name?: string };
+// Accept both new (company) and legacy (company_name) shapes.
+// Allow null/undefined so callers can pass `job` directly.
+type LegacyJob = { company_name?: string | null };
+type CompanySource = { company?: string | null } & Partial<LegacyJob>;
 
-function getCompany(j?: { company?: string } | (Record<string, unknown> & Partial<LegacyJob>)) {
-  if (!j) return 'Unknown Company';
-  if (typeof j.company === 'string' && j.company.trim()) return j.company;
-  if ('company_name' in j) {
-    const v = (j as LegacyJob).company_name;
-    if (typeof v === 'string' && v.trim()) return v;
-  }
-  return 'Unknown Company';
+function getCompany(job: CompanySource | null | undefined): string {
+  if (!job) return 'Unknown Company';
+  return job.company ?? job.company_name ?? 'Unknown Company';
 }
 
 interface TailoredJobCardProps {
