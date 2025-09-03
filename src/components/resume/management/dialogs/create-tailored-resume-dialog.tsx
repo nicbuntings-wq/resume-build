@@ -18,6 +18,7 @@ import { createTailoredResume } from "@/utils/actions/resumes/actions";
 import { CreateBaseResumeDialog } from "./create-base-resume-dialog";
 import { tailorResumeToJob, formatJobListing } from "@/utils/actions/jobs/ai";
 import { createJob } from "@/utils/actions/jobs/actions";
+import type { SimplifiedJobInput } from "@/utils/actions/jobs/actions";
 import { MiniResumePreview } from "../../shared/mini-resume-preview";
 import { LoadingOverlay, type CreationStep } from "../loading-overlay";
 import { BaseResumeSelector } from "../base-resume-selector";
@@ -139,7 +140,22 @@ export function CreateTailoredResumeDialog({
             });
 
             setCurrentStep('formatting');
-            const jobEntry = await createJob(formattedJobListing);
+
+            // Build typed input to satisfy `createJob` requirements
+            const jobInputImportProfile: SimplifiedJobInput = {
+              company: (formattedJobListing as LegacyJobLike).company ?? (formattedJobListing as LegacyJobLike).company_name ?? undefined,
+              location: formattedJobListing.location ?? null,
+              description: formattedJobListing.description ?? null,
+              position_title: formattedJobListing.position_title ?? '',
+              job_url: formattedJobListing.job_url ?? null,
+              keywords: formattedJobListing.keywords ?? [],
+              work_location: normalizeWorkLocation(formattedJobListing.work_location),
+              employment_type: formattedJobListing.employment_type as SimplifiedJobInput['employment_type'],
+              salary_range: formattedJobListing.salary_range ?? null,
+              is_active: formattedJobListing.is_active ?? true,
+            };
+
+            const jobEntry = await createJob(jobInputImportProfile);
             if (!jobEntry?.id) throw new Error("Failed to create job entry");
 
             jobId = jobEntry.id;
@@ -244,9 +260,21 @@ export function CreateTailoredResumeDialog({
 
       setCurrentStep('formatting');
 
-      // 2. Create job in database and get ID
-      formattedJobListing.work_location = normalizeWorkLocation(formattedJobListing.work_location);
-      const jobEntry = await createJob(formattedJobListing);
+      // 2. Create job in database and get ID (typed object to satisfy union types)
+      const jobInputAI: SimplifiedJobInput = {
+        company: (formattedJobListing as LegacyJobLike).company ?? (formattedJobListing as LegacyJobLike).company_name ?? undefined,
+        location: formattedJobListing.location ?? null,
+        description: formattedJobListing.description ?? null,
+        position_title: formattedJobListing.position_title ?? '',
+        job_url: formattedJobListing.job_url ?? null,
+        keywords: formattedJobListing.keywords ?? [],
+        work_location: normalizeWorkLocation(formattedJobListing.work_location),
+        employment_type: formattedJobListing.employment_type as SimplifiedJobInput['employment_type'],
+        salary_range: formattedJobListing.salary_range ?? null,
+        is_active: formattedJobListing.is_active ?? true,
+      };
+
+      const jobEntry = await createJob(jobInputAI);
       if (!jobEntry?.id) throw new Error("Failed to create job entry");
 
       // 3. Get the base resume object
