@@ -23,7 +23,7 @@ import { cn } from "@/lib/utils";
 // Accept both new (company) and legacy (company_name) shapes.
 type LegacyJobLike = { company?: string; company_name?: string | null };
 
-function readCompany(j: LegacyJobLike | null | undefined): string {
+function getCompany(j: LegacyJobLike | null | undefined): string {
   if (!j) return '';
   return j.company ?? j.company_name ?? '';
 }
