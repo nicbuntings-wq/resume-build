@@ -37,7 +37,7 @@ export interface Skill {
 export interface Job {
   id: string;
   user_id: string;
-  company_name: string;
+  company: string;   // ← renamed from company_name
   position_title: string;
   job_url: string | null;
   description: string | null;
