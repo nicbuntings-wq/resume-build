@@ -24,7 +24,6 @@ import { BaseResumeSelector } from "../base-resume-selector";
 import { ImportMethodRadioGroup } from "../import-method-radio-group";
 import { JobDescriptionInput } from "../job-description-input";
 import { ApiErrorDialog } from "@/components/ui/api-error-dialog";
-import { cn } from "@/lib/utils";
 
 // ------------------------------
 // Helper: read company safely from either `company` (new) or `company_name` (legacy)
