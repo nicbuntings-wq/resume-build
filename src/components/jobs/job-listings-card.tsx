@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Briefcase, Building2, MapPin, Clock, DollarSign, Trash2} from "lucide-react";
+import { Briefcase, Building2, MapPin, Clock, DollarSign, Trash2 } from "lucide-react";
 import { getJobListings, deleteJob } from "@/utils/actions/jobs/actions";
 import { createClient } from "@/utils/supabase/client";
 import {
@@ -15,25 +15,20 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
+import type { Job as CanonicalJob } from "@/lib/types";
 
+// ---- Types -----------------------------------------------------------------
 
 type WorkLocationType = 'remote' | 'in_person' | 'hybrid';
-type EmploymentType = 'full_time' | 'part_time' | 'co_op' | 'internship';
+type EmploymentType = 'full_time' | 'part_time' | 'co_op' | 'internship' | 'contract';
 
-interface Job {
-  id: string;
-  company_name: string;
-  position_title: string;
-  location: string | null;
-  work_location: WorkLocationType | null;
-  employment_type: EmploymentType | null;
-  salary_range: string | null;
-  created_at: string;
-  keywords: string[] | null;
-}
+// Use the canonical Job from @/lib/types, but allow legacy `company_name` during rollout.
+type UIJob = CanonicalJob & { company_name?: string };
+
+// ---- Component --------------------------------------------------------------
 
 export function JobListingsCard() {
-  const [jobs, setJobs] = useState<Job[]>([]);
+  const [jobs, setJobs] = useState<UIJob[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
@@ -72,7 +67,9 @@ export function JobListingsCard() {
           employmentType
         }
       });
-      setJobs(result.jobs);
+
+      // result.jobs is CanonicalJob[]; UIJob[] accepts it (company_name is optional)
+      setJobs(result.jobs as UIJob[]);
       setTotalPages(result.totalPages);
     } catch (error) {
       console.error('Error fetching jobs:', error);
@@ -85,19 +82,18 @@ export function JobListingsCard() {
     fetchJobs();
   }, [fetchJobs]);
 
-
-
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
+    // Relative day label (today, in x days, x days ago)
     return new Intl.RelativeTimeFormat('en', { numeric: 'auto' }).format(
       Math.ceil((date.getTime() - Date.now()) / (1000 * 60 * 60 * 24)),
       'day'
     );
   };
 
-  const formatWorkLocation = (workLocation: Job['work_location']) => {
-    if (!workLocation) return 'Not specified';
-    return workLocation.replace('_', ' ');
+  const formatWorkLocation = (wl: UIJob['work_location']) => {
+    if (!wl) return 'Not specified';
+    return wl.replace('_', ' ');
   };
 
   const handleDeleteJob = async (jobId: string) => {
@@ -168,6 +164,7 @@ export function JobListingsCard() {
                     <SelectItem value="part_time">⌛ Part Time</SelectItem>
                     <SelectItem value="co_op">🤝 Co-op</SelectItem>
                     <SelectItem value="internship">🎓 Internship</SelectItem>
+                    <SelectItem value="contract">🧩 Contract</SelectItem>
                   </SelectContent>
                 </Select>
                 <div className="absolute inset-0 -z-10 bg-gradient-to-r from-purple-500/20 to-rose-500/20 blur opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -214,7 +211,7 @@ export function JobListingsCard() {
                       <div className="flex items-center text-gray-600">
                         <Building2 className="w-4 h-4 mr-2 text-purple-500" />
                         <span className="line-clamp-1 group-hover:text-purple-700 transition-colors duration-300">
-                          {job.company_name}
+                          {job.company ?? job.company_name ?? 'Unknown Company'}
                         </span>
                       </div>
                     </div>
@@ -241,7 +238,7 @@ export function JobListingsCard() {
                     </div>
                     <div className="flex items-center gap-2 group-hover:text-rose-600 transition-colors duration-300">
                       <DollarSign className="w-4 h-4" />
-                      <span>{job.salary_range}</span>
+                      <span>{job.salary_range ?? '—'}</span>
                     </div>
                     <div className="flex items-center gap-2 group-hover:text-teal-600 transition-colors duration-300">
                       <Clock className="w-4 h-4" />
@@ -300,4 +297,4 @@ export function JobListingsCard() {
       </Card>
     </div>
   );
-} 
+}
