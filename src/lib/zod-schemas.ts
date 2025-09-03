@@ -164,7 +164,7 @@ export type SectionConfig = z.infer<typeof sectionConfigSchema>;
 // Jobs schema
 export const jobSchema = z.object({
   id: z.string().uuid(),
-  company_name: z.string().optional(),
+  company: z.string().optional(),                     // ← renamed
   position_title: z.string().optional(),
   job_url: z.string().url().nullable(),
   description: z.string().nullable(),
@@ -175,30 +175,30 @@ export const jobSchema = z.object({
   keywords: z.array(z.string()).default([]),
   work_location: z.enum(['remote', 'in_person', 'hybrid']).nullable(),
   employment_type: z.preprocess(
-    (val) => val === null || val === '' ? 'full_time' : val,
+    (val) => (val === null || val === '' ? 'full_time' : val),
     z.enum(['full_time', 'part_time', 'co_op', 'internship', 'contract']).default('full_time')
   ).optional(),
   is_active: z.boolean().default(true),
 });
 
 export const simplifiedJobSchema = z.object({
-    company_name: z.string().optional(),
-    position_title: z.string().optional(),
-    job_url: z.string().nullable().optional(),
-    description: z.string().nullable().optional(),
-    location: z.string().nullable().optional(),
-    salary_range: z.string().nullable().optional(),
-    keywords: z.array(z.string()).default([]).optional(),
-    work_location: z.preprocess(
-      (val) => val === null || val === '' ? 'in_person' : val,
-      z.enum(['remote', 'in_person', 'hybrid']).nullable().optional()
-    ),
-    employment_type: z.preprocess(
-      (val) => val === null || val === '' ? 'full_time' : val,
-      z.enum(['full_time', 'part_time', 'co_op', 'internship', 'contract'])
-    ).optional(),
-    is_active: z.boolean().default(true).optional(),
-  });
+  company: z.string().optional(),                     // ← renamed
+  position_title: z.string().optional(),
+  job_url: z.string().nullable().optional(),
+  description: z.string().nullable().optional(),
+  location: z.string().nullable().optional(),
+  salary_range: z.string().nullable().optional(),
+  keywords: z.array(z.string()).default([]).optional(),
+  work_location: z.preprocess(
+    (val) => (val === null || val === '' ? 'in_person' : val),
+    z.enum(['remote', 'in_person', 'hybrid']).nullable().optional()
+  ),
+  employment_type: z.preprocess(
+    (val) => (val === null || val === '' ? 'full_time' : val),
+    z.enum(['full_time', 'part_time', 'co_op', 'internship', 'contract'])
+  ).optional(),
+  is_active: z.boolean().default(true).optional(),
+});
   
 export const simplifiedResumeSchema = z.object({
     work_experience: z.array(workExperienceSchema).optional(),
@@ -211,7 +211,7 @@ export const simplifiedResumeSchema = z.object({
 // Add type inference helper
 export type Job = {
   id?: string;
-  company_name?: string;
+  company?: string;                                   // ← renamed
   position_title?: string;
   job_url?: string | null;
   description?: string | null;
