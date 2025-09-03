@@ -353,7 +353,6 @@ function createResumeStyles(settings: Resume['document_settings'] = {
       fontSize: document_font_size,
       lineHeight: document_line_height,
       position: 'relative',
-      // backgroundColor: '#32a852',  // Bright green color that should be very visible for testing
     },
     header: {
       alignItems: 'center',
@@ -572,24 +571,22 @@ export const ResumePDFDocument = memo(function ResumePDFDocument({ resume }: Res
         <ExperienceSection experiences={resume.work_experience} styles={styles} />
         <ProjectsSection projects={resume.projects} styles={styles} />
         <EducationSection education={resume.education} styles={styles} />
-        
-       {resume.document_settings?.show_ubc_footer && (
-  <View style={styles.footer}>
-    <Image 
-      src="/images/ubc-science-footer.png"
-      alt="" // ✅ added: satisfies eslint rule
-      style={styles.footerImage}
-    />
-  </View>
-)}
+
+        {resume.document_settings?.show_ubc_footer && (
+          <View style={styles.footer}>
+            {/* eslint-disable-next-line jsx-a11y/alt-text */}
+            <Image
+              src="/images/ubc-science-footer.png"
+              style={styles.footerImage}
+            />
+          </View>
         )}
       </PDFPage>
     </PDFDocument>
   );
 }, (prevProps, nextProps) => {
-  // Custom comparison function
   return (
     prevProps.resume === nextProps.resume &&
     prevProps.variant === nextProps.variant
   );
-}); 
+});
