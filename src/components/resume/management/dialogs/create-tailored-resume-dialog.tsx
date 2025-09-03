@@ -35,6 +35,19 @@ function readCompany(j: LegacyJobLike | null | undefined): string {
   return j.company ?? j.company_name ?? '';
 }
 
+type LocalSimplifiedJobInput = {
+  company?: string;
+  location?: string | null;
+  description?: string | null;
+  position_title?: string;
+  job_url?: string | null;
+  keywords?: string[];
+  work_location?: 'remote' | 'in_person' | 'hybrid' | null;
+  employment_type?: string | null;
+  salary_range?: string | null;
+  is_active?: boolean;
+};
+
 interface CreateTailoredResumeDialogProps {
   children: React.ReactNode;
   baseResumes?: Resume[];
@@ -149,13 +162,12 @@ export function CreateTailoredResumeDialog({
               job_url: formattedJobListing.job_url ?? null,
               keywords: formattedJobListing.keywords ?? [],
               work_location: normalizeWorkLocation(formattedJobListing.work_location),
-              // keep whatever string comes back; backend can validate or map
-              employment_type: formattedJobListing.employment_type as any,
+              employment_type: formattedJobListing.employment_type ?? null,
               salary_range: formattedJobListing.salary_range ?? null,
               is_active: formattedJobListing.is_active ?? true,
             };
 
-            const jobEntry = await createJob(jobInputImportProfile as any);
+            const jobEntry = await createJob(jobInputImportProfile as LocalSimplifiedJobInput);
             if (!jobEntry?.id) throw new Error("Failed to create job entry");
 
             jobId = jobEntry.id;
@@ -274,7 +286,7 @@ export function CreateTailoredResumeDialog({
         is_active: formattedJobListing.is_active ?? true,
       };
 
-      const jobEntry = await createJob(jobInputAI as any);
+     const jobEntry = await createJob(jobInputImportProfile as LocalSimplifiedJobInput);
       if (!jobEntry?.id) throw new Error("Failed to create job entry");
 
       // 3. Get the base resume object
