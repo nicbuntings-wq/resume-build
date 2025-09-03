@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Briefcase, Building2, MapPin, Clock, DollarSign, Trash2 } from "lucide-react";
 import { getJobListings, deleteJob } from "@/utils/actions/jobs/actions";
 import { createClient } from "@/utils/supabase/client";
 import {
@@ -13,7 +12,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
 import type { Job as CanonicalJob } from "@/lib/types";
 
