@@ -20,10 +20,12 @@ import { JobDescriptionInput } from "../job-description-input";
 import { ApiErrorDialog } from "@/components/ui/api-error-dialog";
 import { cn } from "@/lib/utils";
 
-// Accept both new (company) and legacy (company_name) shapes.
+// ------------------------------
+// Helper: read company safely from either `company` (new) or `company_name` (legacy)
+// ------------------------------
 type LegacyJobLike = { company?: string; company_name?: string | null };
 
-function getCompany(j: LegacyJobLike | null | undefined): string {
+function readCompany(j: LegacyJobLike | null | undefined): string {
   if (!j) return '';
   return j.company ?? j.company_name ?? '';
 }
@@ -112,7 +114,7 @@ export function CreateTailoredResumeDialog({ children, baseResumes, profile }: C
 
           const selectedModel = localStorage.getItem(MODEL_STORAGE_KEY);
           const storedKeys = localStorage.getItem(LOCAL_STORAGE_KEY);
-          let apiKeys = [];
+          let apiKeys: unknown[] = [];
 
           try {
             apiKeys = storedKeys ? JSON.parse(storedKeys) : [];
@@ -189,7 +191,7 @@ export function CreateTailoredResumeDialog({ children, baseResumes, profile }: C
 
       const selectedModel = localStorage.getItem(MODEL_STORAGE_KEY);
       const storedKeys = localStorage.getItem(LOCAL_STORAGE_KEY);
-      let apiKeys = [];
+      let apiKeys: unknown[] = [];
 
       try {
         apiKeys = storedKeys ? JSON.parse(storedKeys) : [];
@@ -197,7 +199,9 @@ export function CreateTailoredResumeDialog({ children, baseResumes, profile }: C
         console.error('Error parsing API keys:', error);
       }
       // 1. Format the job listing
-      let formattedJobListing;
+      let formattedJobListing: LegacyJobLike & {
+        position_title?: string;
+      };
       try {
         formattedJobListing = await formatJobListing(jobDescription, {
           model: selectedModel || '',
@@ -275,7 +279,7 @@ export function CreateTailoredResumeDialog({ children, baseResumes, profile }: C
         baseResume,
         jobEntry.id,
         formattedJobListing.position_title || '',
-        getCompany(formattedJobListing) || '',
+        readCompany(formattedJobListing) || '',
         tailoredContent,
       );
 
@@ -612,4 +616,4 @@ export function CreateTailoredResumeDialog({ children, baseResumes, profile }: C
       />
     </>
   );
-} 
+}
