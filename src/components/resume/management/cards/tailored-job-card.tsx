@@ -22,6 +22,18 @@ import { AccordionItem, AccordionTrigger, AccordionContent } from "@/components/
 import { BriefcaseIcon } from "lucide-react";
 import { formatJobListing } from "@/utils/actions/jobs/ai";
 
+type LegacyJob = { company_name?: string };
+
+function getCompany(j?: { company?: string } | (Record<string, unknown> & Partial<LegacyJob>)) {
+  if (!j) return 'Unknown Company';
+  if (typeof j.company === 'string' && j.company.trim()) return j.company;
+  if ('company_name' in j) {
+    const v = (j as LegacyJob).company_name;
+    if (typeof v === 'string' && v.trim()) return v;
+  }
+  return 'Unknown Company';
+}
+
 interface TailoredJobCardProps {
   jobId: string | null;
   // onJobDelete?: () => void;
@@ -488,11 +500,11 @@ export function TailoredJobAccordion({
 
   if (resume.is_base_resume) return null;
 
-  const title = job?.position_title || "Target Job";
-// AFTER
-const company = job?.company ?? (job as any)?.company_name ?? 'Unknown Company';
-  const handleDelete = async () => {
-    if (!resume.job_id) return;
+ const title = job?.position_title || "Target Job";
+const company = getCompany(job);
+
+const handleDelete = async () => {
+  if (!resume.job_id) return;
     
     try {
       setIsDeleting(true);
