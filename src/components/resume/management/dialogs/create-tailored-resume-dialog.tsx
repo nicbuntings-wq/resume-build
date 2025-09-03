@@ -275,7 +275,7 @@ export function CreateTailoredResumeDialog({ children, baseResumes, profile }: C
         baseResume,
         jobEntry.id,
         formattedJobListing.position_title || '',
-        formattedJobListing.company_name || '',
+        getCompany(formattedJobListing) || '',
         tailoredContent,
       );
 
