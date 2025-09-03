@@ -7,6 +7,9 @@ import type { Job } from "@/lib/types";
 import { z } from "zod";
 import { JobListingParams } from "./schema";
 
+/**
+ * Create a new job posting
+ */
 export async function createJob(jobListing: z.infer<typeof simplifiedJobSchema>) {
   const supabase = await createClient();
   const { data: { user }, error: userError } = await supabase.auth.getUser();
@@ -15,22 +18,23 @@ export async function createJob(jobListing: z.infer<typeof simplifiedJobSchema>)
     throw new Error('User not authenticated');
   }
 
-  // Prefer `company`, but gracefully fall back to `company_name`
+  // Handle company field gracefully
   const company =
     // @ts-expect-error tolerate older schema for now
     (jobListing as any).company ??
     // @ts-expect-error tolerate older schema for now
-    (jobListing as any).company_name;
+    (jobListing as any).company_name ??
+    "Unknown Company";
 
-  const jobData = {
+  const jobData: Partial<Job> = {
     user_id: user.id,
-    company, // ✅ matches Supabase column
-    position_title: jobListing.position_title,
-    job_url: jobListing.job_url,
-    description: jobListing.description,
-    location: jobListing.location,
-    salary_range: jobListing.salary_range,
-    keywords: jobListing.keywords,
+    company, // ✅ matches DB column
+    position_title: jobListing.position_title ?? "Untitled Role",
+    job_url: jobListing.job_url ?? null,
+    description: jobListing.description ?? null,
+    location: jobListing.location ?? null,
+    salary_range: jobListing.salary_range ?? null,
+    keywords: jobListing.keywords ?? [],
     work_location: jobListing.work_location || 'in_person',
     employment_type: jobListing.employment_type || 'full_time',
     is_active: true,
@@ -40,7 +44,7 @@ export async function createJob(jobListing: z.infer<typeof simplifiedJobSchema>)
     .from('jobs')
     .insert([jobData])
     .select()
-    .single();
+    .single<Job>();
 
   if (error) {
     console.error('[createJob] Error creating job:', error);
@@ -50,6 +54,9 @@ export async function createJob(jobListing: z.infer<typeof simplifiedJobSchema>)
   return data;
 }
 
+/**
+ * Delete a job and revalidate affected resumes
+ */
 export async function deleteJob(jobId: string): Promise<void> {
   const supabase = await createClient();
   const { data: { user }, error } = await supabase.auth.getUser();
@@ -84,6 +91,9 @@ export async function deleteJob(jobId: string): Promise<void> {
   revalidatePath('/resumes', 'layout');
 }
 
+/**
+ * Get paginated list of jobs with filters
+ */
 export async function getJobListings({
   page = 1,
   pageSize = 10,
@@ -122,13 +132,16 @@ export async function getJobListings({
   }
 
   return {
-    jobs,
+    jobs: jobs as Job[],
     totalCount: count ?? 0,
     currentPage: page,
     totalPages: Math.ceil((count ?? 0) / pageSize),
   };
 }
 
+/**
+ * Soft delete (deactivate) a tailored job
+ */
 export async function deleteTailoredJob(jobId: string): Promise<void> {
   const supabase = await createClient();
 
@@ -144,6 +157,9 @@ export async function deleteTailoredJob(jobId: string): Promise<void> {
   revalidatePath('/', 'layout');
 }
 
+/**
+ * Create an empty job placeholder
+ */
 export async function createEmptyJob(): Promise<Job> {
   const supabase = await createClient();
   const { data: { user }, error: userError } = await supabase.auth.getUser();
@@ -154,15 +170,15 @@ export async function createEmptyJob(): Promise<Job> {
 
   const emptyJob: Partial<Job> = {
     user_id: user.id,
-    company: 'New Company', // ✅ use `company`
+    company: 'New Company',
     position_title: 'New Position',
     job_url: null,
     description: null,
     location: null,
     salary_range: null,
     keywords: [],
-    work_location: null,
-    employment_type: null,
+    work_location: 'in_person',
+    employment_type: 'full_time',
     is_active: true,
   };
 
@@ -170,7 +186,7 @@ export async function createEmptyJob(): Promise<Job> {
     .from('jobs')
     .insert([emptyJob])
     .select()
-    .single();
+    .single<Job>();
 
   if (error) {
     console.error('Error creating job:', error);
@@ -178,5 +194,5 @@ export async function createEmptyJob(): Promise<Job> {
   }
 
   revalidatePath('/', 'layout');
-  return data as Job;
+  return data;
 }
