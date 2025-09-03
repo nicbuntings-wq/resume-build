@@ -26,3 +26,23 @@ export function sanitizeUnknownStrings<T>(data: T): T {
   }
   return data;
 }
+
+// 🔽 Add helper here at the bottom
+export function normalizeWorkLocation(
+  loc: string | null | undefined
+): "remote" | "in_person" | "hybrid" | null | undefined {
+  if (!loc) return loc;
+
+  const val = loc.toLowerCase();
+  if (val.includes("remote")) return "remote";
+  if (val.includes("hybrid")) return "hybrid";
+  if (
+    val.includes("in-person") ||
+    val.includes("in_person") ||
+    val.includes("office")
+  ) {
+    return "in_person";
+  }
+
+  return undefined; // fallback so TS doesn’t complain
+}
