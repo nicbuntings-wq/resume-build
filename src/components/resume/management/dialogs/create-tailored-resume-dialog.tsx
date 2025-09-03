@@ -20,6 +20,14 @@ import { JobDescriptionInput } from "../job-description-input";
 import { ApiErrorDialog } from "@/components/ui/api-error-dialog";
 import { cn } from "@/lib/utils";
 
+// Accept both new (company) and legacy (company_name) shapes.
+type LegacyJobLike = { company?: string; company_name?: string | null };
+
+function readCompany(j: LegacyJobLike | null | undefined): string {
+  if (!j) return '';
+  return j.company ?? j.company_name ?? '';
+}
+
 interface CreateTailoredResumeDialogProps {
   children: React.ReactNode;
   baseResumes?: Resume[];
@@ -125,7 +133,7 @@ export function CreateTailoredResumeDialog({ children, baseResumes, profile }: C
             
             jobId = jobEntry.id;
             jobTitle = formattedJobListing.position_title || 'Copied Resume';
-            companyName = formattedJobListing.company_name || '';
+            companyName = readCompany(formattedJobListing);
           } catch (error: Error | unknown) {
             if (error instanceof Error && (
                 error.message.toLowerCase().includes('api key') || 
