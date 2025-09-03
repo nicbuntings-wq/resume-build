@@ -20,7 +20,7 @@ import type { Job as CanonicalJob } from "@/lib/types";
 // ---- Types -----------------------------------------------------------------
 
 type WorkLocationType = 'remote' | 'in_person' | 'hybrid';
-type EmploymentType = 'full_time' | 'part_time' | 'co_op' | 'internship' | 'contract';
+type EmploymentType = 'full_time' | 'part_time' | 'co_op' | 'internship';
 
 // Use the canonical Job from @/lib/types, but allow legacy `company_name` during rollout.
 type UIJob = CanonicalJob & { company_name?: string };
