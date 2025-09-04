@@ -6,10 +6,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LoginForm } from "@/components/auth/login-form";
 import { SignupForm } from "@/components/auth/signup-form";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Github, Loader2 } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { AuthProvider } from "./auth-context";
-import { signInWithGithub } from "@/app/auth/login/actions";
-import { Separator } from "@/components/ui/separator";
 
 const gradientClasses = {
   base: "bg-gradient-to-r from-violet-600 via-blue-600 to-violet-600",
@@ -43,65 +41,6 @@ function TabButton({ value, children }: TabButtonProps) {
     >
       {children}
     </TabsTrigger>
-  );
-}
-
-function SocialAuth() {
-  const [isLoading, setIsLoading] = useState(false);
-
-  const handleGithubSignIn = async () => {
-    try {
-      setIsLoading(true);
-      const result = await signInWithGithub();
-      
-      if (!result.success) {
-        console.error('❌ GitHub sign in error:', result.error);
-      } else if (result.url) {
-        window.location.href = result.url;
-      }
-    } catch (error) {
-      console.error('💥 Failed to sign in with GitHub:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  return (
-    <div className="space-y-3 mt-4">
-      <div className="relative">
-        <div className="absolute inset-0 flex items-center">
-          <Separator className="bg-slate-200" />
-        </div>
-        <div className="relative flex justify-center text-xs">
-          <span className="bg-white px-3 text-slate-500">
-            or
-          </span>
-        </div>
-      </div>
-      <Button
-        variant="outline"
-        className="
-          w-full h-10 bg-white border-slate-200 hover:bg-slate-50 hover:border-slate-300
-          text-slate-700 font-medium transition-all duration-200
-          focus:ring-2 focus:ring-slate-500 focus:ring-offset-1
-          rounded-lg
-        "
-        onClick={handleGithubSignIn}
-        disabled={isLoading}
-      >
-        {isLoading ? (
-          <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Connecting...
-          </>
-        ) : (
-          <>
-            <Github className="mr-2 h-4 w-4" />
-            Continue with GitHub
-          </>
-        )}
-      </Button>
-    </div>
   );
 }
 
@@ -173,7 +112,6 @@ export function AuthDialog({ children }: AuthDialogProps) {
                     <p className="text-sm text-slate-600 mt-1">Sign in to continue</p>
                   </div>
                   <LoginForm />
-                  <SocialAuth />
                 </TabsContent>
                 
                 <TabsContent value="signup" className="mt-0 space-y-4">
@@ -182,7 +120,6 @@ export function AuthDialog({ children }: AuthDialogProps) {
                     <p className="text-sm text-slate-600 mt-1">Create your free account</p>
                   </div>
                   <SignupForm />
-                  <SocialAuth />
                 </TabsContent>
               </div>
             </Tabs>
