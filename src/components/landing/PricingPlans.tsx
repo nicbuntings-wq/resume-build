@@ -33,12 +33,11 @@ export function PricingPlans() {
     {
       name: "Free",
       price: "$0",
-      description: "Self-host or use with your own API keys",
+      description: "For just taking a peak",
       features: [
         { text: "Use your own API keys" },
         { text: "2 base resumes" },
         { text: "5 tailored resumes" },
-        { text: "Self-host option available" },
       ],
       ctaText: "Get Started",
       ctaLink: "/auth/register",
@@ -55,7 +54,6 @@ export function PricingPlans() {
         { text: "Access to all premium AI models", highlight: true },
         { text: "Unlimited base resumes", highlight: true },
         { text: "Unlimited tailored resumes", highlight: true },
-        { text: "Support an independent student developer ❤️" },
       ],
       ctaText: "Get Started",
       ctaLink: "/auth/register",
