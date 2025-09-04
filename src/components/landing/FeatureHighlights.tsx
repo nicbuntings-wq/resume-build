@@ -190,7 +190,7 @@ const FeatureHighlights = () => {
             </span>
           </h2>
           <p className="text-lg text-muted-foreground mb-8">
-            Join 50,000+ professionals who are getting more interviews with ResumeLM
+            Join 1000's of professionals who are getting more interviews with Cyme.AI
           </p>
           
           {/* Single, centered button */}
