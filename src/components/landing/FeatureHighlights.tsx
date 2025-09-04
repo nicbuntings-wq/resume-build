@@ -124,7 +124,7 @@ const FeatureHighlights = () => {
         <SplitContent
           imageSrc="/SS Score.png"
           heading="Resume Performance Scoring"
-          description="Get detailed insights into your resume's effectiveness with our comprehensive scoring system. Track key metrics, identify areas for improvement, and optimize your resume to stand out to employers and ATS systems."
+          description="Get detailed insights into your resumes effectiveness with our comprehensive scoring system. Track key metrics, identify areas for improvement, and optimize your resume to stand out to employers and ATS systems."
           imageOnLeft={false}
           imageOverflowRight={true}
           badgeText="3x higher response rates"
@@ -190,7 +190,7 @@ const FeatureHighlights = () => {
             </span>
           </h2>
           <p className="text-lg text-muted-foreground mb-8">
-            Join 1000's of professionals who are getting more interviews with Cyme.AI
+            Join thousands of professionals who are getting more interviews with Cyme.AI
           </p>
           
           {/* Single, centered button */}
