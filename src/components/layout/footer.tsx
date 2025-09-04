@@ -20,7 +20,7 @@ export function Footer({ variant = "fixed" }: FooterProps) {
         variant === "fixed" ? "fixed bottom-0 left-0 right-0" : "static"
       }`}
     >
-      <div className="container py-4 md:py-0 flex flex-col md:flex-row h-auto md:h-14 items-center justify-between gap-4 md:gap-0">
+      <div className="container py-3 md:py-0 flex flex-col md:flex-row h-auto md:h-14 items-center justify-between gap-4 md:gap-0">
         {/* Left: brand */}
         <div className="flex items-center gap-2 md:gap-4">
           <p className="hidden md:block text-sm text-muted-foreground">Cyme.AI {year}</p>
