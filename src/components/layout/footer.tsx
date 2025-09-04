@@ -1,3 +1,9 @@
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import Link from "next/link";
 import { Mail } from "lucide-react";
 
@@ -20,35 +26,34 @@ export function Footer({ variant = "fixed" }: FooterProps) {
           <p className="text-sm text-muted-foreground">Cyme.AI {year}</p>
         </div>
 
-        {/* Right: legal + support */}
-        <nav className="flex flex-col md:flex-row items-center gap-4 md:gap-6">
-          <Link
-            href="mailto:support@cyme.ai"
-            className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors underline-offset-4 hover:underline"
-          >
-            <Mail className="h-4 w-4" />
-            <span>Contact Support</span>
-          </Link>
+       {/* Right: support + legal dropdown */}
+<nav className="flex items-center gap-4">
+  <Link
+    href="mailto:support@cyme.ai"
+    className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors underline-offset-4 hover:underline"
+  >
+    <Mail className="h-4 w-4" />
+    <span>Contact Support</span>
+  </Link>
 
-          <Link
-            href="/terms.html"
-            className="text-sm text-muted-foreground hover:text-foreground transition-colors underline-offset-4 hover:underline"
-          >
-            Terms of Use
-          </Link>
-          <Link
-            href="/privacy.html"
-            className="text-sm text-muted-foreground hover:text-foreground transition-colors underline-offset-4 hover:underline"
-          >
-            Privacy Policy
-          </Link>
-          <Link
-            href="/licenses.html"
-            className="text-sm text-muted-foreground hover:text-foreground transition-colors underline-offset-4 hover:underline"
-          >
-            Licenses
-          </Link>
-        </nav>
+  {/* Dropdown for legal links */}
+  <DropdownMenu>
+    <DropdownMenuTrigger className="text-sm text-muted-foreground hover:text-foreground transition-colors underline-offset-4 hover:underline">
+      More
+    </DropdownMenuTrigger>
+    <DropdownMenuContent align="end" className="bg-background border rounded-md p-1">
+      <DropdownMenuItem asChild>
+        <Link href="/terms.html">Terms of Use</Link>
+      </DropdownMenuItem>
+      <DropdownMenuItem asChild>
+        <Link href="/privacy.html">Privacy Policy</Link>
+      </DropdownMenuItem>
+      <DropdownMenuItem asChild>
+        <Link href="/licenses.html">Licenses</Link>
+      </DropdownMenuItem>
+    </DropdownMenuContent>
+  </DropdownMenu>
+</nav>
       </div>
     </footer>
   );
