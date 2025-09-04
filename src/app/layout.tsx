@@ -1,3 +1,19 @@
+import { Inter } from "next/font/google";
+import "./globals.css";
+
+import Link from "next/link";
+import { Analytics } from "@vercel/analytics/react";
+import { Toaster } from "sonner";
+import { Footer } from "@/components/layout/footer";
+import { AppHeader } from "@/components/layout/app-header";
+
+import { createClient } from "@/utils/supabase/server";
+import { getSubscriptionStatus } from "@/utils/actions/stripe/actions";
+import type { Metadata } from "next";
+import { cookies } from "next/headers";
+
+const inter = Inter({ subsets: ["latin"] });
+
 export const metadata: Metadata = {
   metadataBase: new URL("https://cyme.ai"),
   title: {
