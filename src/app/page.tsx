@@ -13,15 +13,15 @@ import Script from "next/script";
 
 // Page-specific metadata that extends the base metadata from layout.tsx
 export const metadata: Metadata = {
-  title: "ResumeLM - AI Resume Builder for Tech Jobs",
+  title: "Cyme.AI - AI Resume Builder for Tech Jobs",
   description: "Create ATS-optimized tech resumes in under 10 minutes. 3x your interview chances with AI-powered resume tailoring.",
   openGraph: {
-    title: "ResumeLM - AI Resume Builder for Tech Jobs",
+    title: "Cyme.AI - AI Resume Builder for Tech Jobs",
     description: "Create ATS-optimized tech resumes in under 10 minutes. 3x your interview chances with AI-powered resume tailoring.",
-    url: "https://resumelm.com",
+    url: "https://cyme.ai",
   },
   twitter: {
-    title: "ResumeLM - AI Resume Builder for Tech Jobs",
+    title: "Cyme.AI - AI Resume Builder for Tech Jobs",
     description: "Create ATS-optimized tech resumes in under 10 minutes. 3x your interview chances with AI-powered resume tailoring.",
   },
 };
