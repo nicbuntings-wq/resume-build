@@ -18,28 +18,28 @@ export function FAQ() {
   // FAQ data - focused on ResumeLM specific questions
   const faqItems: FAQItem[] = [
     {
-      question: "How does Wooed.AI tailor my resume for specific jobs?",
+      question: "How does Cyme.AI tailor my resume for specific jobs?",
       answer: "Our AI analyzes job descriptions and automatically adjusts your resume content, keywords, and formatting to match what recruiters and ATS systems are looking for. It optimizes your bullet points, highlights relevant skills, and ensures your experience aligns with the job requirements."
     },
     {
-      question: "Is Wooed.AI really free to use?",
+      question: "Is Cyme.AI really free to use?",
       answer: "Yes! Our free plan includes 2 base resumes and 5 tailored resumes using your own API keys. Our Pro plan ($30/month) provides unlimited resumes and access to premium AI models without needing your own API keys."
     },
     {
-      question: "What makes Wooed.AI different from other resume builders?",
-      answer: "Wooed.ai is specifically designed with AI-powered optimization, ATS compatibility, and the ability to create multiple tailored versions from one base resume."
+      question: "What makes Cyme.AI different from other resume builders?",
+      answer: "Cyme.AI is specifically designed with AI-powered optimization, ATS compatibility, and the ability to create multiple tailored versions from one base resume."
     },
     {
-      question: "How long does it take to create a resume with Wooed.AI?",
+      question: "How long does it take to create a resume with Cyme.AI?",
       answer: "Most users create their first resume in under 15 minutes. Once you have a base resume, generating tailored versions for specific jobs takes just 2-3 minutes with our AI assistant."
     },
     {
       question: "Will my resume pass ATS (Applicant Tracking Systems)?",
-      answer: "Absolutely! Wooed.AI is specifically designed to create ATS-optimized resumes. Our templates use proper formatting, keyword optimization, and structure that ATS systems can easily parse and rank highly."
+      answer: "Absolutely! Cyme.AI is specifically designed to create ATS-optimized resumes. Our templates use proper formatting, keyword optimization, and structure that ATS systems can easily parse and rank highly."
     },
     {
       question: "Can I use my own AI API keys?",
-      answer: "Yes! With our free plan, you can use your own OpenAI, Anthropic, or other AI provider API keys. This gives you full control over costs and usage while still accessing all of ResumeLM's features."
+      answer: "Yes! With our free plan, you can use your own OpenAI, Anthropic, or other AI provider API keys. This gives you full control over costs and usage while still accessing all of Cyme.AI's features."
     },
     {
       question: "Is my data secure and private?",
@@ -47,7 +47,7 @@ export function FAQ() {
     },
     {
       question: "Do you offer support for students or career changers?",
-      answer: "Absolutely! Wooed.AI is perfect for students, career changers, and professionals at any level. Our AI helps highlight transferable skills and optimize your resume regardless of your experience level."
+      answer: "Absolutely! Cyme.AI is perfect for students, career changers, and professionals at any level. Our AI helps highlight transferable skills and optimize your resume regardless of your experience level."
     }
   ];
 
@@ -115,7 +115,7 @@ export function FAQ() {
           transition={{ duration: 0.6, delay: 0.4 }}
           className="text-base md:text-lg text-muted-foreground"
         >
-          Quick answers to help you get started with ResumeLM
+          Quick answers to help you get started with Cyme.AI
         </motion.p>
       </div>
       
