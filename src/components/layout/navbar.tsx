@@ -19,7 +19,7 @@ export function Navbar() {
         <div className="flex items-center gap-8">
           {/* Logo/Brand */}
           <Link href="/home" className="text-xl font-semibold bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent">
-            Resume.AI
+            Cyme.AI
           </Link>
 
           {/* Navigation Links */}
