@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import React, { useRef } from 'react';
+import React, { useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import { HelpCircle, Sparkles } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -11,78 +11,81 @@ interface FAQItem {
 }
 
 export function FAQ() {
-  // Refs for intersection observer
   const sectionRef = useRef<HTMLElement>(null);
   const isInView = useInView(sectionRef, { once: true, margin: "-100px" });
 
-  // FAQ data - focused on ResumeLM specific questions
   const faqItems: FAQItem[] = [
     {
-      question: "How does Wooed.AI tailor my resume for specific jobs?",
-      answer: "Our AI analyzes job descriptions and automatically adjusts your resume content, keywords, and formatting to match what recruiters and ATS systems are looking for. It optimizes your bullet points, highlights relevant skills, and ensures your experience aligns with the job requirements."
+      question: "How does Cyme.AI tailor my resume for specific jobs?",
+      answer:
+        "Our AI analyzes the job description and adjusts your content, keywords, and structure to match what recruiters and ATS systems look for. It sharpens bullet points, highlights relevant skills, and aligns your experience with the role."
     },
     {
-      question: "Is Wooed.AI really free to use?",
-      answer: "Yes! Our free plan includes 2 base resumes and 5 tailored resumes using your own API keys. Our Pro plan ($30/month) provides unlimited resumes and access to premium AI models without needing your own API keys."
+      question: "Is Cyme.AI free to use?",
+      answer:
+        "Yes—there’s a free tier so you can get started quickly. You can also use your own AI provider API keys. Our Pro plan unlocks more usage and built-in access to premium models without bringing your own keys."
     },
     {
-      question: "What makes Wooed.AI different from other resume builders?",
-      answer: "Wooed.ai is specifically designed with AI-powered optimization, ATS compatibility, and the ability to create multiple tailored versions from one base resume."
+      question: "What makes Cyme.AI different from other resume builders?",
+      answer:
+        "Cyme.AI focuses on AI-powered tailoring, ATS compatibility, and quick iteration. Start from a single base resume, then generate targeted versions for each job in minutes."
     },
     {
-      question: "How long does it take to create a resume with Wooed.AI?",
-      answer: "Most users create their first resume in under 15 minutes. Once you have a base resume, generating tailored versions for specific jobs takes just 2-3 minutes with our AI assistant."
+      question: "How long does it take to create a resume with Cyme.AI?",
+      answer:
+        "Most people create a solid base resume in under 15 minutes. From there, generating tailored versions for new roles typically takes just a couple of minutes."
     },
     {
       question: "Will my resume pass ATS (Applicant Tracking Systems)?",
-      answer: "Absolutely! Wooed.AI is specifically designed to create ATS-optimized resumes. Our templates use proper formatting, keyword optimization, and structure that ATS systems can easily parse and rank highly."
+      answer:
+        "That’s the goal. Our templates and suggestions favor clean formatting, consistent sectioning, and keyword alignment so ATS can parse and rank your resume more reliably."
     },
     {
       question: "Can I use my own AI API keys?",
-      answer: "Yes! With our free plan, you can use your own OpenAI, Anthropic, or other AI provider API keys. This gives you full control over costs and usage while still accessing all of ResumeLM's features."
+      answer:
+        "Absolutely. You can plug in your own OpenAI, Anthropic, or other supported provider keys and keep full control of costs. Pro users can also use Cyme.AI’s built-in models without bringing keys."
     },
     {
       question: "Is my data secure and private?",
-      answer: "Your privacy is our priority. All data is encrypted. We never share your personal information or resume data with third parties."
+      answer:
+        "We take privacy seriously. Data is transmitted securely and we don’t sell your personal information. You’re in control of your content and API keys."
     },
     {
-      question: "Do you offer support for students or career changers?",
-      answer: "Absolutely! Wooed.AI is perfect for students, career changers, and professionals at any level. Our AI helps highlight transferable skills and optimize your resume regardless of your experience level."
+      question: "Is Cyme.AI good for students and career changers?",
+      answer:
+        "Yes. Cyme.AI helps surface transferable skills and reshape experience for new roles or industries, making it ideal for students, career changers, and seasoned professionals alike."
     }
   ];
 
-  // Animation variants
   const containerVariants = {
     hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.1 }
-    }
+    visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
   };
 
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.6, ease: "easeOut" }
-    }
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
   };
 
   return (
-    <section 
+    <section
       ref={sectionRef}
-      className="py-16 md:py-20 px-4 relative overflow-hidden scroll-mt-20" 
+      className="py-16 md:py-20 px-4 relative overflow-hidden scroll-mt-20"
       id="faq"
       aria-labelledby="faq-heading"
     >
-      {/* Simplified background decoration */}
-      <div aria-hidden="true" className="absolute -top-32 -right-32 w-64 h-64 rounded-full bg-gradient-to-br from-purple-200/15 to-indigo-200/15 blur-3xl"></div>
-      <div aria-hidden="true" className="absolute -bottom-32 -left-32 w-64 h-64 rounded-full bg-gradient-to-tr from-teal-200/15 to-cyan-200/15 blur-3xl"></div>
-      
-      {/* Compact Heading Section */}
+      {/* Background accents */}
+      <div
+        aria-hidden="true"
+        className="absolute -top-32 -right-32 w-64 h-64 rounded-full bg-gradient-to-br from-purple-200/15 to-indigo-200/15 blur-3xl"
+      />
+      <div
+        aria-hidden="true"
+        className="absolute -bottom-32 -left-32 w-64 h-64 rounded-full bg-gradient-to-tr from-teal-200/15 to-cyan-200/15 blur-3xl"
+      />
+
+      {/* Heading */}
       <div className="relative z-10 max-w-2xl mx-auto text-center mb-12">
-        {/* Badge */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: -20 }}
@@ -94,8 +97,7 @@ export function FAQ() {
             FAQ
           </span>
         </motion.div>
-        
-        {/* Compact heading */}
+
         <motion.h2
           id="faq-heading"
           initial={{ opacity: 0, y: 20 }}
@@ -107,19 +109,18 @@ export function FAQ() {
             Questions & Answers
           </span>
         </motion.h2>
-        
-        {/* Shorter description */}
+
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ duration: 0.6, delay: 0.4 }}
           className="text-base md:text-lg text-muted-foreground"
         >
-          Quick answers to help you get started with ResumeLM
+          Quick answers to help you get started with Cyme.AI
         </motion.p>
       </div>
-      
-      {/* Compact FAQ Accordion */}
+
+      {/* FAQ */}
       <motion.div
         className="relative z-10 max-w-3xl mx-auto"
         variants={containerVariants}
@@ -128,13 +129,9 @@ export function FAQ() {
       >
         <Accordion type="single" collapsible className="space-y-2">
           {faqItems.map((item, index) => (
-            <motion.div
-              key={index}
-              variants={itemVariants}
-              className="group"
-            >
-              <AccordionItem 
-                value={`item-${index}`} 
+            <motion.div key={index} variants={itemVariants} className="group">
+              <AccordionItem
+                value={`item-${index}`}
                 className="border border-gray-200/50 rounded-lg bg-white/40 backdrop-blur-sm hover:bg-white/60 transition-all duration-200 hover:shadow-sm hover:border-purple-200/50 px-4 py-1"
               >
                 <AccordionTrigger className="text-left hover:no-underline group-hover:text-purple-700 transition-colors duration-200 py-4 text-sm md:text-base font-medium">
@@ -149,8 +146,8 @@ export function FAQ() {
               </AccordionItem>
             </motion.div>
           ))}
-                </Accordion>
+        </Accordion>
       </motion.div>
     </section>
   );
-} 
+}
