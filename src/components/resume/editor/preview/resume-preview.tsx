@@ -34,12 +34,17 @@ const CACHE_CLEANUP_INTERVAL = 5 * 60 * 1000;
 // Cache expiration time (30 minutes)
 const CACHE_EXPIRATION_TIME = 30 * 60 * 1000;
 
+// NEW: bump this when the PDF layout/content changes
+const PDF_TEMPLATE_VERSION = '2025-09-08-refnote-v1';
+
 /**
  * Generate a simple hash from the resume content
  * This is used as a cache key for PDF generation
  */
-function generateResumeHash(resume: Resume): string {
+function generateResumeHash(resume: Resume, templateVersion: string, variant: 'base' | 'tailored'): string {
   const content = JSON.stringify({
+    templateVersion,   // include template version
+    variant,           // include variant
     basic: {
       name: `${resume.first_name} ${resume.last_name}`,
       contact: [resume.email, resume.phone_number, resume.location, resume.website, resume.linkedin_url, resume.github_url],
@@ -117,13 +122,14 @@ export const ResumePreview = memo(function ResumePreview({ resume, variant = 'ba
   // Convert percentage to pixels based on parent container
   const getPixelWidth = useCallback(() => {
     if (typeof window === 'undefined') return 0;
-    // console.log('debouncedWidth (INSIDE)'+containerWidth);
-    // console.log('debouncedWidth * 10 (INSIDE)'+debouncedWidth * 10);
     return ((debouncedWidth));
   }, [debouncedWidth]);
 
-  // Generate resume hash for caching
-  const resumeHash = useMemo(() => generateResumeHash(resume), [resume]);
+  // Generate resume hash for caching (NOW includes templateVersion + variant)
+  const resumeHash = useMemo(
+    () => generateResumeHash(resume, PDF_TEMPLATE_VERSION, variant),
+    [resume, variant]
+  );
 
   // Add styles to document head
   useEffect(() => {
@@ -340,4 +346,4 @@ export const ResumePreview = memo(function ResumePreview({ resume, variant = 'ba
     prevProps.variant === nextProps.variant &&
     prevProps.containerWidth === nextProps.containerWidth
   );
-}); 
+});
