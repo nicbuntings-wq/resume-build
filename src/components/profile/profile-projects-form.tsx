@@ -23,11 +23,24 @@ export function ProfileProjectsForm({ projects, onChange }: ProfileProjectsFormP
     Object.fromEntries(projects.map((p, i) => [i, p.technologies?.join(', ') || '']))
   );
 
+  // ✅ Only react to length changes, and preserve what the user is typing
   React.useEffect(() => {
-    setTechInputs(Object.fromEntries(
-      projects.map((p, i) => [i, p.technologies?.join(', ') || ''])
-    ));
-  }, [projects]);
+    setTechInputs(prev => {
+      const next: { [key: number]: string } = { ...prev };
+      // add new indices
+      projects.forEach((p, i) => {
+        if (next[i] === undefined) {
+          next[i] = p.technologies?.join(', ') || '';
+        }
+      });
+      // remove stale indices
+      Object.keys(next).forEach(k => {
+        const idx = Number(k);
+        if (idx >= projects.length) delete next[idx];
+      });
+      return next;
+    });
+  }, [projects.length]);
 
   const addProject = () => {
     onChange([...projects, {
@@ -151,20 +164,12 @@ export function ProfileProjectsForm({ projects, onChange }: ProfileProjectsFormP
                     onChange={(e) => {
                       const newValue = e.target.value;
                       setTechInputs(prev => ({ ...prev, [index]: newValue }));
-                      
-                      if (newValue.endsWith(',')) {
-                        const technologies = newValue
-                          .split(',')
-                          .map(t => t.trim())
-                          .filter(Boolean);
-                        updateProject(index, 'technologies', technologies);
-                      } else {
-                        const technologies = newValue
-                          .split(',')
-                          .map(t => t.trim())
-                          .filter(Boolean);
-                        updateProject(index, 'technologies', technologies);
-                      }
+
+                      const technologies = newValue
+                        .split(',')
+                        .map(t => t.trim())
+                        .filter(Boolean);
+                      updateProject(index, 'technologies', technologies);
                     }}
                     onBlur={(e) => {
                       const technologies = e.target.value
@@ -203,7 +208,7 @@ export function ProfileProjectsForm({ projects, onChange }: ProfileProjectsFormP
 
                 {/* Description */}
                 <div className="space-y-1.5">
-                  <div className="flex justify-between items-baseline">
+                  <div className="flex justify_between items-baseline">
                     <Label className="text-xs font-medium text-violet-700">Description</Label>
                     <Button
                       variant="ghost"
@@ -273,4 +278,4 @@ export function ProfileProjectsForm({ projects, onChange }: ProfileProjectsFormP
       </Button>
     </div>
   );
-} 
+}
