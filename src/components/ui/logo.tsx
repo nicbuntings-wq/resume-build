@@ -46,7 +46,7 @@ export function Logo({ className, asLink = true }: LogoProps) {
       ctx.textBaseline = 'middle';
       
       // Draw text (centered)
-      const text = 'ResumeLM';
+      const text = 'Cyme.AI';
       const textMetrics = ctx.measureText(text);
       const x = (800 - textMetrics.width) / 2;
       ctx.fillText(text, x, 100);
@@ -78,7 +78,7 @@ export function Logo({ className, asLink = true }: LogoProps) {
             font-weight="bold"
             text-anchor="middle"
             dominant-baseline="middle">
-            ResumeLM
+            Cyme.AI
           </text>
         </svg>
       `;

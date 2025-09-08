@@ -20,16 +20,16 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
   const post = getPostBySlug(slug);
   if (!post) return {};
   
-  const url = `https://resumelm.com/blog/${slug}`;
+  const url = `https://cyme.ai/blog/${slug}`;
   const publishedTime = new Date(post.frontMatter.date).toISOString();
   
   return {
     title: post.frontMatter.title,
     description: post.frontMatter.description,
     keywords: ['resume builder', 'tech jobs', 'Vancouver tech', 'career advice', 'AI resume', 'job search'],
-    authors: [{ name: 'ResumeLM Team' }],
-    creator: 'ResumeLM',
-    publisher: 'ResumeLM',
+    authors: [{ name: 'Cyme.AI Team' }],
+    creator: 'Cyme.AI',
+    publisher: 'Cyme.AI',
     category: 'Career Advice',
     alternates: {
       canonical: url,
@@ -38,10 +38,10 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
       title: post.frontMatter.title,
       description: post.frontMatter.description,
       url: url,
-      siteName: 'ResumeLM',
+      siteName: 'Cyme.AI',
       type: 'article',
       publishedTime: publishedTime,
-      authors: ['ResumeLM Team'],
+      authors: ['Cyme.AI Team'],
       images: [
         {
           url: '/og.webp',
@@ -159,26 +159,26 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                 '@type': 'Article',
                 headline: post.frontMatter.title,
                 description: post.frontMatter.description,
-                image: 'https://resumelm.com/og.webp',
+                image: 'https://cyme.ai/og.webp',
                 datePublished: new Date(post.frontMatter.date).toISOString(),
                 dateModified: new Date(post.frontMatter.date).toISOString(),
                 author: {
                   '@type': 'Organization',
-                  name: 'ResumeLM Team',
-                  url: 'https://resumelm.com',
+                  name: 'Cyme.AI Team',
+                  url: 'https://cyme.ai',
                 },
                 publisher: {
                   '@type': 'Organization',
-                  name: 'ResumeLM',
+                  name: 'Cyme.AI',
                   logo: {
                     '@type': 'ImageObject',
-                    url: 'https://resumelm.com/og.webp',
+                    url: 'https://cyme.ai/og.webp',
                   },
-                  url: 'https://resumelm.com',
+                  url: 'https://cyme.ai',
                 },
                 mainEntityOfPage: {
                   '@type': 'WebPage',
-                  '@id': `https://resumelm.com/blog/${slug}`,
+                  '@id': `https://cyme.ai/blog/${slug}`,
                 },
                 articleSection: 'Career Advice',
                 keywords: 'resume builder, tech jobs, Vancouver tech, career advice, AI resume, job search',
@@ -220,7 +220,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                 Ready to build your perfect resume?
               </h3>
               <p className="text-gray-600 mb-6 max-w-md mx-auto">
-                Join thousands of professionals who have already transformed their careers with ResumeLM.
+                Join thousands of professionals who have already transformed their careers with Cyme.AI.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link

@@ -17,21 +17,21 @@ import { ModelShowcase } from "@/components/landing/model-showcase";
 // import { WaitlistSection } from "@/components/waitlist/waitlist-section";
 
 export const metadata: Metadata = {
-  title: "Login | ResumeLM - AI-Powered Resume Builder",
-  description: "Create tailored, ATS-optimized resumes powered by AI. ResumeLM helps you land your dream tech job with personalized resume optimization.",
+  title: "Login | Cyme.AI - AI-Powered Resume Builder",
+  description: "Create tailored, ATS-optimized resumes powered by AI. Cyme.AI helps you land your dream tech job with personalized resume optimization.",
   keywords: ["resume builder", "AI resume", "ATS optimization", "tech jobs", "career tools", "job application"],
-  authors: [{ name: "ResumeLM" }],
+  authors: [{ name: "Cyme.AI" }],
   openGraph: {
-    title: "ResumeLM - AI-Powered Resume Builder",
+    title: "Cyme.AI - AI-Powered Resume Builder",
     description: "Create tailored, ATS-optimized resumes powered by AI. Land your dream tech job with personalized resume optimization.",
-    url: "https://resumelm.com//",
-    siteName: "ResumeLM",
+    url: "https://cyme.ai//",
+    siteName: "Cyme.AI",
     images: [
       {
         url: "/og.webp",
         width: 1200,
         height: 630,
-        alt: "ResumeLM - AI Resume Builder",
+        alt: "Cyme.AI - AI Resume Builder",
       },
     ],
     locale: "en_US",
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "ResumeLM - AI-Powered Resume Builder",
+    title: "Cyme.AI - AI-Powered Resume Builder",
     description: "Create tailored, ATS-optimized resumes powered by AI. Land your dream tech job with personalized resume optimization.",
     images: ["/og.webp"],
     creator: "@resumelm",

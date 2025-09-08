@@ -60,13 +60,13 @@ export async function generateMetadata({
     const { id } = await params;
     const { resume } = await getResumeById(id);
     return {
-      title: `${resume.name} | ResumeLM`,
+      title: `${resume.name} | Cyme.AI`,
       description: `Editing ${resume.name} - ${resume.target_role} resume`,
     };
   } catch (error) {
     void error;
     return {
-      title: 'Resume Editor | ResumeLM',
+      title: 'Resume Editor | Cyme.AI',
       description: 'AI-powered resume editor',
     };
   }
