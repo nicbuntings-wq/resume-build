@@ -345,7 +345,7 @@ function createResumeStyles(settings: Resume['document_settings'] = {
     // Base page configuration
     page: {
       paddingTop: document_margin_vertical,
-      paddingBottom: document_margin_vertical + 28,
+      paddingBottom: document_margin_vertical + 36, // was + 28
       paddingLeft: document_margin_horizontal,
       paddingRight: document_margin_horizontal,
       fontFamily: 'Helvetica',
@@ -552,6 +552,18 @@ function createResumeStyles(settings: Resume['document_settings'] = {
       width: `${footer_width}%`,
       height: 'auto',
     },
+    // NEW: references line styles
+    referencesNoteContainer: {
+      marginTop: 8,
+      minHeight: 18,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    referencesNoteText: {
+      fontSize: 9,
+      color: '#6b7280',
+      textAlign: 'center',
+    },
   });
 }
 
@@ -581,6 +593,13 @@ export const ResumePDFDocument = memo(function ResumePDFDocument({ resume }: Res
             />
           </View>
         )}
+
+        {/* NEW: References note — flow-based block at the bottom */}
+        <View style={styles.referencesNoteContainer}>
+          <Text style={styles.referencesNoteText}>
+            References available upon request
+          </Text>
+        </View>
       </PDFPage>
     </PDFDocument>
   );
@@ -590,4 +609,4 @@ export const ResumePDFDocument = memo(function ResumePDFDocument({ resume }: Res
     prevProps.resume === nextProps.resume &&
     prevProps.variant === nextProps.variant
   );
-}); 
+});
