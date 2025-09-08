@@ -100,7 +100,7 @@ export function Logo({ className, asLink = true }: LogoProps) {
       <ContextMenuTrigger>
         <div ref={logoRef} className="transition-transform duration-500 hover:scale-105">
           <GradientHover className={cn("text-2xl font-bold", className)}>
-            ResumeLM
+            Cyme.AI
           </GradientHover>
         </div>
       </ContextMenuTrigger>
