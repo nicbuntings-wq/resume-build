@@ -43,46 +43,6 @@ function TabButton({ value, children }: TabButtonProps) {
     </TabsTrigger>
   );
 }
-  };
-
-  return (
-    <div className="space-y-3 mt-4">
-      <div className="relative">
-        <div className="absolute inset-0 flex items-center">
-          <Separator className="bg-slate-200" />
-        </div>
-        <div className="relative flex justify-center text-xs">
-          <span className="bg-white px-3 text-slate-500">
-            or
-          </span>
-        </div>
-      </div>
-      <Button
-        variant="outline"
-        className="
-          w-full h-10 bg-white border-slate-200 hover:bg-slate-50 hover:border-slate-300
-          text-slate-700 font-medium transition-all duration-200
-          focus:ring-2 focus:ring-slate-500 focus:ring-offset-1
-          rounded-lg
-        "
-        onClick={handleGithubSignIn}
-        disabled={isLoading}
-      >
-        {isLoading ? (
-          <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Connecting...
-          </>
-        ) : (
-          <>
-            <Github className="mr-2 h-4 w-4" />
-            Continue with GitHub
-          </>
-        )}
-      </Button>
-    </div>
-  );
-}
 
 export function AuthDialog({ children }: AuthDialogProps) {
   const [open, setOpen] = useState(false);
