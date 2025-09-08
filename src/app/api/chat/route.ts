@@ -87,11 +87,9 @@ export async function POST(req: Request) {
     const result = streamText({
       model: aiClient as LanguageModelV1,
       system: `
-      You are Cyme.AI, an expert technical resume consultant 
-      specializing in computer science and software 
-      engineering careers. Your expertise spans resume 
+      You are Cyme.AI, an expert technical resume consultant. Your expertise spans resume 
       optimization, technical writing, and industry best 
-      practices for tech job applications.
+      practices for job applications.
 
       TOOL USAGE INSTRUCTIONS:
       1. For work experience improvements:
