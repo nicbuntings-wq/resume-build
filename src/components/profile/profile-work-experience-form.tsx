@@ -44,11 +44,22 @@ export function ProfileWorkExperienceForm({ experiences, onChange }: ProfileWork
     Object.fromEntries(experiences.map((exp, i) => [i, exp.technologies?.join(', ') || '']))
   );
 
+  // ✅ Only react to length changes, and preserve what the user is typing
   React.useEffect(() => {
-    setTechInputs(Object.fromEntries(
-      experiences.map((exp, i) => [i, exp.technologies?.join(', ') || ''])
-    ));
-  }, [experiences]);
+    setTechInputs(prev => {
+      const next: { [key: number]: string } = { ...prev };
+      experiences.forEach((exp, i) => {
+        if (next[i] === undefined) {
+          next[i] = exp.technologies?.join(', ') || '';
+        }
+      });
+      Object.keys(next).forEach(k => {
+        const idx = Number(k);
+        if (idx >= experiences.length) delete next[idx];
+      });
+      return next;
+    });
+  }, [experiences.length]);
 
   return (
     <div className="space-y-3">
@@ -86,7 +97,7 @@ export function ProfileWorkExperienceForm({ experiences, onChange }: ProfileWork
                     <Input
                       value={exp.position}
                       onChange={(e) => updateExperience(index, 'position', e.target.value)}
-                      className="text-base bg-white/50 border-gray-200 rounded-md h-8
+                      className="text-base bg_white/50 border-gray-200 rounded-md h-8
                         focus:border-cyan-500/40 focus:ring-1 focus:ring-cyan-500/20
                         hover:border-cyan-500/30 hover:bg-white/60 transition-colors
                         placeholder:text-gray-400"
@@ -166,20 +177,12 @@ export function ProfileWorkExperienceForm({ experiences, onChange }: ProfileWork
                     onChange={(e) => {
                       const newValue = e.target.value;
                       setTechInputs(prev => ({ ...prev, [index]: newValue }));
-                      
-                      if (newValue.endsWith(',')) {
-                        const technologies = newValue
-                          .split(',')
-                          .map(t => t.trim())
-                          .filter(Boolean);
-                        updateExperience(index, 'technologies', technologies);
-                      } else {
-                        const technologies = newValue
-                          .split(',')
-                          .map(t => t.trim())
-                          .filter(Boolean);
-                        updateExperience(index, 'technologies', technologies);
-                      }
+
+                      const technologies = newValue
+                        .split(',')
+                        .map(t => t.trim())
+                        .filter(Boolean);
+                      updateExperience(index, 'technologies', technologies);
                     }}
                     onBlur={(e) => {
                       const technologies = e.target.value
@@ -273,4 +276,4 @@ export function ProfileWorkExperienceForm({ experiences, onChange }: ProfileWork
       </Button>
     </div>
   );
-} 
+}
