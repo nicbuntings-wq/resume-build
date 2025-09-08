@@ -6,10 +6,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LoginForm } from "@/components/auth/login-form";
 import { SignupForm } from "@/components/auth/signup-form";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Github, Loader2 } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { AuthProvider } from "./auth-context";
-import { signInWithGithub } from "@/app/auth/login/actions";
-import { Separator } from "@/components/ui/separator";
 
 const gradientClasses = {
   base: "bg-gradient-to-r from-violet-600 via-blue-600 to-violet-600",
@@ -45,25 +43,6 @@ function TabButton({ value, children }: TabButtonProps) {
     </TabsTrigger>
   );
 }
-
-function SocialAuth() {
-  const [isLoading, setIsLoading] = useState(false);
-
-  const handleGithubSignIn = async () => {
-    try {
-      setIsLoading(true);
-      const result = await signInWithGithub();
-      
-      if (!result.success) {
-        console.error('❌ GitHub sign in error:', result.error);
-      } else if (result.url) {
-        window.location.href = result.url;
-      }
-    } catch (error) {
-      console.error('💥 Failed to sign in with GitHub:', error);
-    } finally {
-      setIsLoading(false);
-    }
   };
 
   return (
@@ -173,7 +152,6 @@ export function AuthDialog({ children }: AuthDialogProps) {
                     <p className="text-sm text-slate-600 mt-1">Sign in to continue</p>
                   </div>
                   <LoginForm />
-                  <SocialAuth />
                 </TabsContent>
                 
                 <TabsContent value="signup" className="mt-0 space-y-4">
@@ -182,7 +160,6 @@ export function AuthDialog({ children }: AuthDialogProps) {
                     <p className="text-sm text-slate-600 mt-1">Create your free account</p>
                   </div>
                   <SignupForm />
-                  <SocialAuth />
                 </TabsContent>
               </div>
             </Tabs>
