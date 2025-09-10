@@ -78,7 +78,7 @@ export const PROVIDERS: Partial<Record<ServiceName, AIProvider>> = {
 export const AI_MODELS: AIModel[] = [
   {
     id: 'gpt-4o',
-    name: 'Pro: Newest Model (GPT-4o)', // <— UI label
+    name: 'Pro: Newest Model', // <— UI label
     provider: 'openai',
     features: {
       isPro: true,
@@ -92,7 +92,7 @@ export const AI_MODELS: AIModel[] = [
   },
   {
     id: 'gpt-4.1-nano',
-    name: 'Free: Older Model (GPT-4.1 Nano)', // <— UI label
+    name: 'Free: Older Model', // <— UI label
     provider: 'openai',
     features: {
       isFree: true,
