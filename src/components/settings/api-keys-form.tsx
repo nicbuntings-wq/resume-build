@@ -12,6 +12,8 @@ import replaceSpecialCharacters from 'replace-special-characters'
 import { ModelSelector } from "@/components/shared/model-selector"
 import { AI_MODELS, MODEL_DESIGNATIONS, getProvidersArray, type ApiKey } from "@/lib/ai-models"
 
+// Only render OpenAI as a provider in this UI
+const providersOpenAIOnly = () => getProvidersArray().filter(p => p.id === 'openai');
 const LOCAL_STORAGE_KEY = 'resumelm-api-keys'
 const MODEL_STORAGE_KEY = 'resumelm-default-model'
 
@@ -209,7 +211,7 @@ export function ApiKeysForm({ isProPlan }: { isProPlan: boolean }) {
 
         <div className="space-y-4">
           {/* Stable Providers */}
-          {getProvidersArray().filter(p => !p.unstable).map(provider => {
+         {getProvidersArray().filter(p => p.id === 'openai').map(provider => {
             const existingKey = getExistingKey(provider.id)
             const isVisible = visibleKeys[provider.id]
             const providerModels = AI_MODELS.filter(model => model.provider === provider.id)
