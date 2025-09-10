@@ -43,9 +43,6 @@ const FeatureHighlights = () => {
           <span className="px-3 py-1 rounded-full bg-gradient-to-r from-teal-600/10 to-cyan-600/10 border border-teal-200/40 text-sm text-teal-700">
             ATS-Optimized
           </span>
-          <span className="px-3 py-1 rounded-full bg-gradient-to-r from-emerald-600/10 to-green-600/10 border border-emerald-200/40 text-sm text-emerald-700">
-            100% Free
-          </span>
         </motion.div>
         
         {/* Heading + subcopy */}
