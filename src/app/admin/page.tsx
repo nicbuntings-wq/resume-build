@@ -86,22 +86,18 @@ export default async function AdminPage() {
                             </CardContent>
                         </Card>
 
-                      {/* Tailored Resumes Card */}
-{/* Tailored Resumes Card */}
-<Card>
-  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-    <CardTitle className="text-sm font-medium flex items-center gap-2">
-      Tailored Resumes
-      <span className="text-xs text-muted-foreground whitespace-nowrap">
-        (Pro recommended — free model may be too limited)
-      </span>
-    </CardTitle>
-    <FilePlus className="h-4 w-4 text-muted-foreground" />
-  </CardHeader>
-  <CardContent>
-    <div className="text-2xl font-bold">{tailoredResumes.toLocaleString()}</div>
-  </CardContent>
-</Card>
+                        {/* Tailored Resumes Card */}
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">
+                                    Tailored Resumes
+                                </CardTitle>
+                                <FilePlus className="h-4 w-4 text-muted-foreground" />
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold">{tailoredResumes.toLocaleString()}</div>
+                            </CardContent>
+                        </Card>
 
                         {/* Pro Users Card */}
                          <Card>
