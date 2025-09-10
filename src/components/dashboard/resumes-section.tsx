@@ -508,8 +508,8 @@ export function ResumesSection({
             {type === 'base' ? 'Base' : 'Tailored'} Resumes
           </h2>
           {type === 'tailored' && (
-            <span className="text-xs sm:text-sm text-muted-foreground sm:whitespace-nowrap">
-              (Pro recommended — free model may be too limited)
+            <span className="text-sm sm:text-base text-muted-foreground sm:whitespace-nowrap">
+              (Pro recommended — free model will be too limited)
             </span>
           )}
         </div>
