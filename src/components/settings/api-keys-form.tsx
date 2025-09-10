@@ -12,8 +12,6 @@ import replaceSpecialCharacters from 'replace-special-characters'
 import { ModelSelector } from "@/components/shared/model-selector"
 import { AI_MODELS, MODEL_DESIGNATIONS, getProvidersArray, type ApiKey } from "@/lib/ai-models"
 
-// Only render OpenAI as a provider in this UI
-const providersOpenAIOnly = () => getProvidersArray().filter(p => p.id === 'openai');
 const LOCAL_STORAGE_KEY = 'resumelm-api-keys'
 const MODEL_STORAGE_KEY = 'resumelm-default-model'
 
