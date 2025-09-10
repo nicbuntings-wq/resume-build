@@ -40,11 +40,24 @@ export function ProfileSkillsForm({ skills, onChange }: ProfileSkillsFormProps) 
     Object.fromEntries(skills.map((s, i) => [i, s.items?.join(', ') || '']))
   );
 
-  React.useEffect(() => {
-    setSkillInputs(Object.fromEntries(
-      skills.map((s, i) => [i, s.items?.join(', ') || ''])
-    ));
-  }, [skills]);
+ // ✅ Only react to length changes, and preserve what the user is typing
+React.useEffect(() => {
+  setSkillInputs(prev => {
+    const next: { [key: number]: string } = { ...prev };
+    // add new indices
+    skills.forEach((s, i) => {
+      if (next[i] === undefined) {
+        next[i] = s.items?.join(', ') || '';
+      }
+    });
+    // remove stale indices
+    Object.keys(next).forEach(k => {
+      const idx = Number(k);
+      if (idx >= skills.length) delete next[idx];
+    });
+    return next;
+  });
+}, [skills.length]);
 
   return (
     <div className="space-y-3">

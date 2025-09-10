@@ -60,15 +60,6 @@ export interface GroupedModels {
 // ========================
 
 export const PROVIDERS: Partial<Record<ServiceName, AIProvider>> = {
-  anthropic: {
-    id: 'anthropic',
-    name: 'Anthropic',
-    apiLink: 'https://console.anthropic.com/',
-    logo: '/logos/claude.png',
-    envKey: 'ANTHROPIC_API_KEY',
-    sdkInitializer: 'anthropic',
-    unstable: false
-  },
   openai: {
     id: 'openai',
     name: 'OpenAI',
@@ -77,17 +68,7 @@ export const PROVIDERS: Partial<Record<ServiceName, AIProvider>> = {
     envKey: 'OPENAI_API_KEY',
     sdkInitializer: 'openai',
     unstable: false
-  },
-  openrouter: {
-    id: 'openrouter',
-    name: 'OpenRouter',
-    apiLink: 'https://openrouter.ai/account/api-keys',
-    logo: '/logos/openrouter.png',
-    envKey: 'OPENROUTER_API_KEY',
-    sdkInitializer: 'openrouter',
-    unstable: false
-    
-  },
+  }
 }
 
 // ========================
@@ -95,41 +76,23 @@ export const PROVIDERS: Partial<Record<ServiceName, AIProvider>> = {
 // ========================
 
 export const AI_MODELS: AIModel[] = [
-  // OpenAI Models
   {
-    id: 'gpt-5',
-    name: 'GPT-5',
+    id: 'gpt-4o',
+    name: 'Pro: Newest Model', // <— UI label
     provider: 'openai',
     features: {
+      isPro: true,
       isRecommended: true,
-      isUnstable: false,
-      maxTokens: 400000,
-      supportsVision: true,
-      supportsTools: true
-    },
-    availability: {
-      requiresApiKey: true,
-      requiresPro: false
-    }
-  },
-  {
-    id: 'gpt-4.1',
-    name: 'GPT 4.1',
-    provider: 'openai',
-    features: {
       isUnstable: false,
       maxTokens: 128000,
       supportsVision: true,
       supportsTools: true
     },
-    availability: {
-      requiresApiKey: true,
-      requiresPro: false
-    }
+    availability: { requiresApiKey: true, requiresPro: true }
   },
   {
     id: 'gpt-4.1-nano',
-    name: 'GPT 4.1 Nano',
+    name: 'Free: Older Model', // <— UI label
     provider: 'openai',
     features: {
       isFree: true,
@@ -138,103 +101,17 @@ export const AI_MODELS: AIModel[] = [
       supportsVision: false,
       supportsTools: true
     },
-    availability: {
-      requiresApiKey: false,
-      requiresPro: false
-    }
-  },
-  {
-    id: 'gpt-4o',
-    name: 'GPT-4o',
-    provider: 'openai',
-    features: {
-      isRecommended: true,
-      isUnstable: false,
-      maxTokens: 128000,
-      supportsVision: true,
-      supportsTools: true
-    },
-    availability: {
-      requiresApiKey: true,
-      requiresPro: false
-    }
-  },
-  {
-    id: 'openai/gpt-oss-120b:nitro',
-    name: 'GPT OSS 120B',
-    provider: 'openai', // Show under OpenAI section
-    features: {
-      isRecommended: true,
-      isUnstable: false,
-      maxTokens: 128000,
-      supportsVision: false,
-      supportsTools: true
-    },
-    availability: {
-      requiresApiKey: true, // Requires OpenRouter API key
-      requiresPro: false
-    },
-  },
-  {
-    id: 'openai/gpt-oss-20b:nitro',
-    name: 'GPT OSS 20B',
-    provider: 'openai', // Show under OpenAI section
-    features: {
-      isRecommended: false,
-      isUnstable: false,
-      maxTokens: 128000,
-      supportsVision: false,
-      supportsTools: true
-    },
-    availability: {
-      requiresApiKey: true, // Requires OpenRouter API key
-      requiresPro: false
-    },
-  },
-
-  // Anthropic Models
-  {
-    id: 'claude-4-sonnet',
-    name: 'Claude Sonnet 4',
-    provider: 'anthropic',
-    features: {
-      isRecommended: true,
-      isUnstable: false,
-      maxTokens: 200000,
-      supportsVision: true,
-      supportsTools: true
-    },
-    availability: {
-      requiresApiKey: true,
-      requiresPro: false
-    }
-  },
-  {
-    id: 'claude-4-sonnet-20250514',
-    name: 'Claude 4 Sonnet (Legacy)',
-    provider: 'anthropic',
-    features: {
-      isUnstable: false,
-      maxTokens: 200000,
-      supportsVision: true,
-      supportsTools: true
-    },
-    availability: {
-      requiresApiKey: true,
-      requiresPro: false
-    }
-  },
-
-
-
+    // NOTE: server still needs OPENAI_API_KEY even for "free" users,
+    // but you can keep requiresApiKey=false if your UI gating expects it.
+    availability: { requiresApiKey: true, requiresPro: false }
+  }
 ]
-
 // ========================
 // Default Model Configuration
 // ========================
 
 export const DEFAULT_MODELS = {
-  PRO_USER: 'claude-4-sonnet',
+  PRO_USER: 'gpt-4o',
   FREE_USER: 'gpt-4.1-nano'
 } as const
 
@@ -247,29 +124,22 @@ export const DEFAULT_MODELS = {
  * Change these to update which models are used globally.
  */
 export const MODEL_DESIGNATIONS = {
-  // Fast & cheap model for parsing, simple tasks, quick analysis
-  FAST_CHEAP: 'openai/gpt-oss-20b:nitro',
-  
-  // Alternative fast & cheap option (free for all users)
+  // Cheap/fast for parsing etc.
+  FAST_CHEAP:      'gpt-4.1-nano',
   FAST_CHEAP_FREE: 'gpt-4.1-nano',
-  
-  // Frontier model for complex tasks, deep analysis, best quality
-  FRONTIER: 'claude-4-sonnet',
-  
-  // Alternative frontier model
-  FRONTIER_ALT: 'gpt-5',
-  
-  // Balanced model - good quality but faster/cheaper than frontier
-  BALANCED: 'openai/gpt-oss-120b:nitro',
-  
-  // Vision-capable model for image analysis
+
+  // Frontier/balanced → use 4o everywhere for paid
+  FRONTIER:     'gpt-4o',
+  FRONTIER_ALT: 'gpt-4o',
+  BALANCED:     'gpt-4o',
+
+  // Vision → 4o supports vision
   VISION: 'gpt-4o',
-  
-  // Default models by user type
-  DEFAULT_PRO: 'claude-4-sonnet',
+
+  // Defaults by user type
+  DEFAULT_PRO:  'gpt-4o',
   DEFAULT_FREE: 'gpt-4.1-nano'
 } as const
-
 // Type for model designations
 export type ModelDesignation = keyof typeof MODEL_DESIGNATIONS
 
@@ -303,6 +173,14 @@ export function getProviderById(id: ServiceName): AIProvider | undefined {
  */
 export function getModelsByProvider(provider: ServiceName): AIModel[] {
   return AI_MODELS.filter(model => model.provider === provider)
+}
+
+/**
+ * Check if a provider has its API key set in the environment
+ */
+function providerEnabledInEnv(p: ServiceName): boolean {
+  const envKey = PROVIDERS[p]?.envKey
+  return !!(envKey && process.env[envKey])
 }
 
 /**
@@ -351,37 +229,34 @@ export function getModelProvider(modelId: string): AIProvider | undefined {
  * Group models by provider for display
  */
 export function groupModelsByProvider(): GroupedModels[] {
-  const providerOrder: ServiceName[] = ['anthropic', 'openai']
-  const grouped = new Map<ServiceName, AIModel[]>()
+  const providerOrder: ServiceName[] = ['openai']; // only OpenAI now
+  const grouped = new Map<ServiceName, AIModel[]>();
 
-  // Group models by provider
   AI_MODELS.forEach(model => {
-    if (!grouped.has(model.provider)) {
-      grouped.set(model.provider, [])
-    }
-    grouped.get(model.provider)!.push(model)
-  })
+    if (!grouped.has(model.provider)) grouped.set(model.provider, []);
+    grouped.get(model.provider)!.push(model);
+  });
 
-  // Return in ordered format
   return providerOrder
     .map(providerId => {
-      const provider = getProviderById(providerId)
-      if (!provider) return null
-      
+      const provider = getProviderById(providerId);
+      if (!provider) return null;
       return {
         provider: providerId,
         name: provider.name,
         models: grouped.get(providerId) || []
-      }
+      };
     })
-    .filter((group): group is GroupedModels => group !== null && group.models.length > 0)
+    .filter((group): group is GroupedModels => group !== null && group.models.length > 0);
 }
 
 /**
  * Get selectable models for a user
  */
 export function getSelectableModels(isPro: boolean, apiKeys: ApiKey[]): AIModel[] {
-  return AI_MODELS.filter(model => isModelAvailable(model.id, isPro, apiKeys))
+  return AI_MODELS
+    .filter(model => providerEnabledInEnv(model.provider))   // NEW: only show if env key exists
+    .filter(model => isModelAvailable(model.id, isPro, apiKeys))
 }
 
 /**

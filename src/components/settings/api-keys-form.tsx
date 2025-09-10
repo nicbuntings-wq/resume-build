@@ -209,7 +209,7 @@ export function ApiKeysForm({ isProPlan }: { isProPlan: boolean }) {
 
         <div className="space-y-4">
           {/* Stable Providers */}
-          {getProvidersArray().filter(p => !p.unstable).map(provider => {
+         {getProvidersArray().filter(p => p.id === 'openai').map(provider => {
             const existingKey = getExistingKey(provider.id)
             const isVisible = visibleKeys[provider.id]
             const providerModels = AI_MODELS.filter(model => model.provider === provider.id)
