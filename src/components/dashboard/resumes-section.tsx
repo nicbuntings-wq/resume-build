@@ -509,7 +509,7 @@ export function ResumesSection({
           </h2>
           {type === 'tailored' && (
             <span className="text-sm sm:text-base text-muted-foreground sm:whitespace-nowrap">
-              Pro recommended — free model will be too limited
+              - If you have already purchased pro, please select it in the navbar. The free model will not work.
             </span>
           )}
         </div>
