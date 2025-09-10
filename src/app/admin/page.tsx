@@ -87,12 +87,13 @@ export default async function AdminPage() {
                         </Card>
 
                       {/* Tailored Resumes Card */}
+{/* Tailored Resumes Card */}
 <Card>
   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
     <CardTitle className="text-sm font-medium flex items-center gap-2">
       Tailored Resumes
-      <span className="text-xs text-muted-foreground">
-        (Best with Pro plan – free model will not be powerful enough)
+      <span className="text-xs text-muted-foreground whitespace-nowrap">
+        (Pro recommended — free model may be too limited)
       </span>
     </CardTitle>
     <FilePlus className="h-4 w-4 text-muted-foreground" />
