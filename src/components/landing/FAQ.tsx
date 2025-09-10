@@ -23,7 +23,7 @@ export function FAQ() {
     {
       question: "Is Cyme.AI free to use?",
       answer:
-        "Yes—there’s a free tier so you can get started quickly. You can also use your own AI provider API keys. Our Pro plan unlocks more usage and built-in access to premium models without bringing your own keys."
+        "Yes—there’s a free tier so you can get started quickly. You can also use your own Open AI API key. Our Pro plan unlocks more usage and built-in access to premium models without bringing your own keys."
     },
     {
       question: "What makes Cyme.AI different from other resume builders?",
@@ -41,14 +41,14 @@ export function FAQ() {
         "That’s the goal. Our templates and suggestions favor clean formatting, consistent sectioning, and keyword alignment so ATS can parse and rank your resume more reliably."
     },
     {
-      question: "Can I use my own AI API keys?",
+      question: "Can I use my own AI API key?",
       answer:
-        "Absolutely. You can plug in your own OpenAI, Anthropic, or other supported provider keys and keep full control of costs. Pro users can also use Cyme.AI’s built-in models without bringing keys."
+        "Absolutely. You can plug in your own OpenAI key and keep full control of costs. Pro users can also use Cyme.AI’s built-in models without bringing a key."
     },
     {
       question: "Is my data secure and private?",
       answer:
-        "We take privacy seriously. Data is transmitted securely and we don’t sell your personal information. You’re in control of your content and API keys."
+        "We take privacy seriously. Data is transmitted securely and we don’t sell your personal information. You’re in control of your content and API key."
     },
     {
       question: "Is Cyme.AI good for students and career changers?",
