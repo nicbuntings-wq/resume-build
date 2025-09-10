@@ -496,30 +496,33 @@ export function ResumesSection({
     );
   };
 
-  return (
-    <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-  <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
-    <h2
-      className={`text-2xl sm:text-3xl font-semibold bg-gradient-to-r ${config.gradient} bg-clip-text text-transparent`}
-    >
-      {type === 'base' ? 'Base' : 'Tailored'} Resumes
-    </h2>
-    {type === 'tailored' && (
-      <span className="text-xs sm:text-sm text-muted-foreground">
-        (Pro recommended — free model may be too limited)
-      </span>
-    )}
-  </div>
-  
-  <div className="flex items-center gap-2 mb-4 sm:mb-0">
-    <ResumeSortControls 
-      sortParam={sortParam}
-      directionParam={directionParam}
-      currentSort={currentSort}
-      currentDirection={currentDirection}
-    />
-  </div>
-</div>
+ return (
+  <div className="relative ">
+    <div className="flex flex-col gap-4 w-full">
+      {/* Header row (mobile: stacked; desktop: inline) */}
+      <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+          <h2
+            className={`text-2xl sm:text-3xl font-semibold bg-gradient-to-r ${config.gradient} bg-clip-text text-transparent`}
+          >
+            {type === 'base' ? 'Base' : 'Tailored'} Resumes
+          </h2>
+          {type === 'tailored' && (
+            <span className="text-xs sm:text-sm text-muted-foreground sm:whitespace-nowrap">
+              (Pro recommended — free model may be too limited)
+            </span>
+          )}
+        </div>
+
+        <div className="flex items-center gap-2 mb-4 sm:mb-0">
+          <ResumeSortControls
+            sortParam={sortParam}
+            directionParam={directionParam}
+            currentSort={currentSort}
+            currentDirection={currentDirection}
+          />
+        </div>
+      </div>
 
         {/* Desktop Pagination (hidden on mobile) */}
         {optimisticCopiedResumes.length > pagination.itemsPerPage && (
