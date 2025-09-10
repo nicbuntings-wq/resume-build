@@ -500,18 +500,25 @@ export function ResumesSection({
     <div className="relative ">
       <div className="flex flex-col gap-4 w-full">
         <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          <h2 className={`text-2xl sm:text-3xl font-semibold tracking-tight bg-gradient-to-r ${config.gradient} bg-clip-text text-transparent`}>
-            {type === 'base' ? 'Base' : 'Tailored'} Resumes
-          </h2>
-          <div className="flex items-center gap-2 mb-4">
-            <ResumeSortControls 
-              sortParam={sortParam}
-              directionParam={directionParam}
-              currentSort={currentSort}
-              currentDirection={currentDirection}
-            />
-          </div>
-        </div>
+  <div className="flex items-center gap-2">
+    <h2 className={`text-2xl sm:text-3xl font-semibold bg-gradient-to-r ${config.gradient} bg-clip-text text-transparent`}>
+      {type === 'base' ? 'Base' : 'Tailored'} Resumes
+    </h2>
+    {type === 'tailored' && (
+      <span className="text-xs sm:text-sm text-muted-foreground whitespace-nowrap">
+        (Pro recommended — free model will not be powerful enough)
+      </span>
+    )}
+  </div>
+  <div className="flex items-center gap-2 mb-4">
+    <ResumeSortControls 
+      sortParam={sortParam}
+      directionParam={directionParam}
+      currentSort={currentSort}
+      currentDirection={currentDirection}
+    />
+  </div>
+</div>
 
         {/* Desktop Pagination (hidden on mobile) */}
         {optimisticCopiedResumes.length > pagination.itemsPerPage && (
