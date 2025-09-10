@@ -37,7 +37,6 @@ export function Hero() {
         <div className="flex flex-wrap gap-3 mt-6">
           <span className="px-3 py-1 rounded-full bg-indigo-50 text-sm border border-indigo-200 text-indigo-700">AI-Powered</span>
           <span className="px-3 py-1 rounded-full bg-teal-50 text-sm border border-teal-200 text-teal-700">ATS-Optimized</span>
-          <span className="px-3 py-1 rounded-full bg-emerald-50 text-sm border border-emerald-200 text-emerald-700">100% Free</span>
           <span className="px-3 py-1 rounded-full bg-blue-50 text-sm border border-blue-200 text-blue-700">Privacy-First</span>
         </div>
         
