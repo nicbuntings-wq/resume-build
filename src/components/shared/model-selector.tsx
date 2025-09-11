@@ -181,6 +181,7 @@ export function ModelSelector({
                   <SelectItem 
                     key={model.id} 
                     value={model.id}
+                    textValue={model.name} 
                     disabled={!isSelectable}
                     className={cn(
                       "transition-colors",
