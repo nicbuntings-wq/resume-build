@@ -9,80 +9,78 @@ import { getSubscriptionStatus } from "@/utils/actions/stripe/actions";
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/react";
 import Link from "next/link";
-import { cookies, headers } from "next/headers";
+import { cookies } from "next/headers";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export async function generateMetadata(): Promise<Metadata> {
-  const h = headers();
-  const host = h.get("x-forwarded-host") ?? "cyme.ai";
-  const proto = h.get("x-forwarded-proto") ?? "https";
-  const base = `${proto}://${host}`;
+// Build a base URL that works in Production and Vercel Preview
+const BASE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "https://cyme.ai");
 
-  return {
-    metadataBase: new URL(base),
-    title: {
-      default: "Cyme.AI — AI-Powered Resume Builder",
-      template: "%s | Cyme.AI",
-    },
+export const metadata: Metadata = {
+  metadataBase: new URL(BASE_URL),
+  title: {
+    default: "Cyme.AI — AI-Powered Resume Builder",
+    template: "%s | Cyme.AI",
+  },
+  description:
+    "Create tailored, ATS-optimized resumes powered by AI. Land your dream job with personalized resume optimization.",
+  applicationName: "Cyme.AI",
+  keywords: [
+    "resume builder",
+    "AI resume",
+    "ATS optimization",
+    "tech jobs",
+    "career tools",
+    "job application",
+  ],
+  authors: [{ name: "Cyme.AI" }],
+  creator: "Cyme.AI",
+  publisher: "Cyme.AI",
+  formatDetection: { email: false, address: false, telephone: false },
+  icons: {
+    icon: [
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon.ico", sizes: "any", type: "image/x-icon" },
+    ],
+    apple: "/overwrite-apple-touch-icon.png",
+  },
+  openGraph: {
+    type: "website",
+    siteName: "Cyme.AI",
+    title: "Cyme.AI — AI-Powered Resume Builder",
     description:
       "Create tailored, ATS-optimized resumes powered by AI. Land your dream job with personalized resume optimization.",
-    applicationName: "Cyme.AI",
-    keywords: [
-      "resume builder",
-      "AI resume",
-      "ATS optimization",
-      "tech jobs",
-      "career tools",
-      "job application",
+    images: [
+      {
+        url: `${BASE_URL}/og-1200x630.png`, // PNG: better for SMS/iMessage/WhatsApp
+        width: 1200,
+        height: 630,
+        alt: "Cyme.AI — AI Resume Builder",
+      },
     ],
-    authors: [{ name: "Cyme.AI" }],
-    creator: "Cyme.AI",
-    publisher: "Cyme.AI",
-    formatDetection: { email: false, address: false, telephone: false },
-    icons: {
-      icon: [
-        { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
-        { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
-        { url: "/favicon.ico", sizes: "any", type: "image/x-icon" },
-      ],
-      apple: "/overwrite-apple-touch-icon.png",
-    },
-    openGraph: {
-      type: "website",
-      siteName: "Cyme.AI",
-      title: "Cyme.AI — AI-Powered Resume Builder",
-      description:
-        "Create tailored, ATS-optimized resumes powered by AI. Land your dream job with personalized resume optimization.",
-      images: [
-        {
-          url: `${base}/og-1200x630.png`,
-          width: 1200,
-          height: 630,
-          alt: "Cyme.AI — AI Resume Builder",
-        },
-      ],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: "Cyme.AI — AI-Powered Resume Builder",
-      description:
-        "Create tailored, ATS-optimized resumes powered by AI. Land your dream job with personalized resume optimization.",
-      images: [`${base}/og-1200x630.png`],
-    },
-    robots: {
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Cyme.AI — AI-Powered Resume Builder",
+    description:
+      "Create tailored, ATS-optimized resumes powered by AI. Land your dream job with personalized resume optimization.",
+    images: [`${BASE_URL}/og-1200x630.png`],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
       index: true,
       follow: true,
-      googleBot: {
-        index: true,
-        follow: true,
-        "max-video-preview": -1,
-        "max-image-preview": "large",
-        "max-snippet": -1,
-      },
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
     },
-  };
-}
+  },
+};
 
 export default async function RootLayout({
   children,
