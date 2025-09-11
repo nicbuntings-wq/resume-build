@@ -34,11 +34,14 @@ export const metadata: Metadata = {
   creator: "Cyme.AI",
   publisher: "Cyme.AI",
   formatDetection: { email: false, address: false, telephone: false },
-  icons: {
-    icon: "/favicon.ico",
-    shortcut: "/favicon-16x16.png",
-    apple: "/apple-touch-icon.png",
-  },
+ icons: {
+  icon: [
+    { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+    { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+    { url: "/favicon.ico", sizes: "any", type: "image/x-icon" },
+  ],
+  apple: "/overwrite-apple-touch-icon.png",
+},
   openGraph: {
     type: "website",
     siteName: "Cyme.AI",
@@ -47,12 +50,19 @@ export const metadata: Metadata = {
       "Create tailored, ATS-optimized resumes powered by AI. Land your dream job with personalized resume optimization.",
     images: [
       {
-        url: "/og.webp",
+        url: "/og-1200x630.png", // safer than webp
         width: 1200,
         height: 630,
         alt: "Cyme.AI — AI Resume Builder",
       },
     ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Cyme.AI — AI-Powered Resume Builder",
+    description:
+      "Create tailored, ATS-optimized resumes powered by AI. Land your dream job with personalized resume optimization.",
+    images: ["/og-1200x630.png"],
   },
   robots: {
     index: true,
