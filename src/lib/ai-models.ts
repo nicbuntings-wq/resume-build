@@ -91,7 +91,7 @@ export const AI_MODELS: AIModel[] = [
     availability: { requiresApiKey: true, requiresPro: true }
   },
   {
-    id: 'gpt-4.1-nano',
+    id: 'gpt-4.1-mini',
     name: 'Free: Older Model', // <— UI label
     provider: 'openai',
     features: {
@@ -112,7 +112,7 @@ export const AI_MODELS: AIModel[] = [
 
 export const DEFAULT_MODELS = {
   PRO_USER: 'gpt-4o',
-  FREE_USER: 'gpt-4.1-nano'
+  FREE_USER: 'gpt-4.1-mini'
 } as const
 
 // ========================
@@ -125,8 +125,8 @@ export const DEFAULT_MODELS = {
  */
 export const MODEL_DESIGNATIONS = {
   // Cheap/fast for parsing etc.
-  FAST_CHEAP:      'gpt-4.1-nano',
-  FAST_CHEAP_FREE: 'gpt-4.1-nano',
+  FAST_CHEAP:      'gpt-4.1-mini',
+  FAST_CHEAP_FREE: 'gpt-4.1-mini',
 
   // Frontier/balanced → use 4o everywhere for paid
   FRONTIER:     'gpt-4o',
@@ -138,7 +138,7 @@ export const MODEL_DESIGNATIONS = {
 
   // Defaults by user type
   DEFAULT_PRO:  'gpt-4o',
-  DEFAULT_FREE: 'gpt-4.1-nano'
+  DEFAULT_FREE: 'gpt-4.1-mini'
 } as const
 // Type for model designations
 export type ModelDesignation = keyof typeof MODEL_DESIGNATIONS
@@ -197,7 +197,7 @@ export function isModelAvailable(
   const model = getModelById(modelId)
   if (!model) return false
 
-  // Free model (gpt-4.1-nano)
+  // Free model (gpt-4.1-mini)
   if (model.features.isFree) return true
 
   // Check if this is an OpenRouter model (contains forward slash)
