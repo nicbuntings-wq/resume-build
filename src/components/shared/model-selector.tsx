@@ -216,9 +216,6 @@ export function ModelSelector({
                           </span>
                         )}
                       </div>
-                      {!isSelectable && (
-                        <span className="ml-1.5 text-muted-foreground flex-shrink-0">(No API Key set)</span>
-                      )}
                     </div>
                   </SelectItem>
                 )
