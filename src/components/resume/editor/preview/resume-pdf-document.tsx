@@ -594,15 +594,6 @@ export const ResumePDFDocument = memo(function ResumePDFDocument({ resume }: Res
           </View>
         )}
 
-        {/* NEW: References note — flow-based block at the bottom */}
-        <View style={styles.referencesNoteContainer}>
-          <Text style={styles.referencesNoteText}>
-            References available upon request
-          </Text>
-        </View>
-      </PDFPage>
-    </PDFDocument>
-  );
 }, (prevProps, nextProps) => {
   // Custom comparison function
   return (
