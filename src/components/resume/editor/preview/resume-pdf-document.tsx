@@ -576,23 +576,26 @@ export const ResumePDFDocument = memo(function ResumePDFDocument({ resume }: Res
   // Memoize styles based on document settings
   const styles = useMemo(() => createResumeStyles(resume.document_settings), [resume.document_settings]);
 
-  return (
-    <PDFDocument>
-      <PDFPage size="LETTER" style={styles.page}>
-        <HeaderSection resume={resume} styles={styles} />
-        <SkillsSection skills={resume.skills} styles={styles} />
-        <ExperienceSection experiences={resume.work_experience} styles={styles} />
-        <ProjectsSection projects={resume.projects} styles={styles} />
-        <EducationSection education={resume.education} styles={styles} />
-        
-        {resume.document_settings?.show_ubc_footer && (
-          <View style={styles.footer}>
-            <Image 
-              src="/images/ubc-science-footer.png"
-              style={styles.footerImage}
-            />
-          </View>
-        )}
+return (
+  <PDFDocument>
+    <PDFPage size="LETTER" style={styles.page}>
+      <HeaderSection resume={resume} styles={styles} />
+      <SkillsSection skills={resume.skills} styles={styles} />
+      <ExperienceSection experiences={resume.work_experience} styles={styles} />
+      <ProjectsSection projects={resume.projects} styles={styles} />
+      <EducationSection education={resume.education} styles={styles} />
+      
+      {resume.document_settings?.show_ubc_footer && (
+        <View style={styles.footer}>
+          <Image 
+            src="/images/ubc-science-footer.png"
+            style={styles.footerImage}
+          />
+        </View>
+      )}
+    </PDFPage>
+  </PDFDocument>
+);
 
 }, (prevProps, nextProps) => {
   // Custom comparison function
