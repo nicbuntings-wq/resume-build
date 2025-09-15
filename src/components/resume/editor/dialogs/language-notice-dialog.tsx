@@ -1,6 +1,7 @@
 "use client";
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 export function LanguageNoticeDialog({
   open,
@@ -15,6 +16,7 @@ export function LanguageNoticeDialog({
         <DialogHeader>
           <DialogTitle>Language Notice</DialogTitle>
         </DialogHeader>
+
         <div className="space-y-3 text-sm text-muted-foreground">
           <p>
             This resume is currently in <strong>American English</strong>.
@@ -38,6 +40,11 @@ export function LanguageNoticeDialog({
             prompt, it will automatically tailor the English type to that location.
           </p>
         </div>
+
+        {/* ✅ Footer with button restored */}
+        <DialogFooter>
+          <Button onClick={() => onOpenChange(false)}>OK, got it</Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
