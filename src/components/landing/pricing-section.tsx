@@ -34,7 +34,7 @@ const tiers: PricingTier[] = [
   },
   {
     name: "Pro",
-    price: "$20",
+    price: "$30",
     description: "Enhanced features for serious job seekers",
     gradient: "from-pink-600/80 to-rose-600/80",
     popular: true,
