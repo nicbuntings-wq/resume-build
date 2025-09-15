@@ -15,6 +15,9 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
 
+// ✅ NEW IMPORT
+import { LanguageNoticeDialog } from "../dialogs/language-notice-dialog";
+
 interface ResumeEditorActionsProps {
   onResumeChange: (field: keyof Resume, value: Resume[keyof Resume]) => void;
 }
@@ -28,6 +31,9 @@ export function ResumeEditorActions({
     resume: true,
     coverLetter: true
   });
+
+  // ✅ NEW STATE
+  const [langOpen, setLangOpen] = useState(false);
 
   // Save Resume
   const handleSave = async () => {
@@ -49,29 +55,23 @@ export function ResumeEditorActions({
     }
   };
 
-
   // Dynamic color classes based on resume type
   const colors = resume.is_base_resume ? {
-    // Import button colors
     importBg: "bg-indigo-600",
     importHover: "hover:bg-indigo-700",
     importShadow: "shadow-indigo-400/20",
-    // Action buttons colors (download & save)
     actionBg: "bg-purple-600",
     actionHover: "hover:bg-purple-700",
     actionShadow: "shadow-purple-400/20"
   } : {
-    // Import button colors
     importBg: "bg-rose-600",
     importHover: "hover:bg-rose-700",
     importShadow: "shadow-rose-400/20",
-    // Action buttons colors (download & save)
     actionBg: "bg-pink-600",
     actionHover: "hover:bg-pink-700",
     actionShadow: "shadow-pink-400/20"
   };
 
-  
   const buttonBaseStyle = cn(
     "transition-all duration-300",
     "relative overflow-hidden",
@@ -113,7 +113,6 @@ export function ResumeEditorActions({
               <Button 
                 onClick={async () => {
                   try {
-                    // Download Resume if selected
                     if (downloadOptions.resume) {
                       const blob = await pdf(<ResumePDFDocument resume={resume} />).toBlob();
                       const url = URL.createObjectURL(blob);
@@ -126,35 +125,17 @@ export function ResumeEditorActions({
                       URL.revokeObjectURL(url);
                     }
 
-                    // Download Cover Letter if selected and exists
                     if (downloadOptions.coverLetter && resume.has_cover_letter) {
-                      // Dynamically import html2pdf only when needed
                       const html2pdf = (await import('html2pdf.js')).default;
-                      
                       const coverLetterElement = document.getElementById('cover-letter-content');
-                      if (!coverLetterElement) {
-                        throw new Error('Cover letter content not found');
-                      }
+                      if (!coverLetterElement) throw new Error('Cover letter content not found');
 
                       const opt = {
                         margin: [0, 0, -0.5, 0],
                         filename: `${resume.first_name}_${resume.last_name}_Cover_Letter.pdf`,
                         image: { type: 'jpeg', quality: 0.98 },
-                        html2canvas: {
-                          backgroundColor: 'red',
-                          useCORS: true,
-                          letterRendering: true,
-                          // width: 700,
-                          // height: 1000,
-                          // windowWidth: 700,
-                          logging: true,
-                          // windowHeight: 2000
-                        },
-                        jsPDF: { 
-                          unit: 'in', 
-                          format: 'letter', 
-                          orientation: 'portrait' 
-                        }
+                        html2canvas: { useCORS: true, logging: true },
+                        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
                       };
 
                       await html2pdf().set(opt).from(coverLetterElement).save();
@@ -164,6 +145,10 @@ export function ResumeEditorActions({
                       title: "Download started",
                       description: "Your documents are being downloaded.",
                     });
+
+                    // ✅ NEW: open language notice after download
+                    setLangOpen(true);
+
                   } catch (error) {
                     console.error(error);
                     toast({
@@ -198,11 +183,6 @@ export function ResumeEditorActions({
                     onCheckedChange={(checked) => 
                       setDownloadOptions(prev => ({ ...prev, resume: checked as boolean }))
                     }
-                    className={cn(
-                      resume.is_base_resume 
-                        ? "border-indigo-400 data-[state=checked]:bg-indigo-600 data-[state=checked]:border-indigo-600"
-                        : "border-rose-400 data-[state=checked]:bg-rose-600 data-[state=checked]:border-rose-600"
-                    )}
                   />
                   <span className="text-sm font-medium text-foreground">Resume</span>
                 </label>
@@ -212,11 +192,6 @@ export function ResumeEditorActions({
                     onCheckedChange={(checked) => 
                       setDownloadOptions(prev => ({ ...prev, coverLetter: checked as boolean }))
                     }
-                    className={cn(
-                      resume.is_base_resume 
-                        ? "border-indigo-400 data-[state=checked]:bg-indigo-600 data-[state=checked]:border-indigo-600"
-                        : "border-rose-400 data-[state=checked]:bg-rose-600 data-[state=checked]:border-rose-600"
-                    )}
                   />
                   <span className="text-sm font-medium text-foreground">Cover Letter</span>
                 </label>
@@ -224,6 +199,9 @@ export function ResumeEditorActions({
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
+
+        {/* ✅ NEW DIALOG COMPONENT */}
+        <LanguageNoticeDialog open={langOpen} onOpenChange={setLangOpen} />
 
         {/* Save Button */}
         <Button 
@@ -246,4 +224,4 @@ export function ResumeEditorActions({
       </div>
     </div>
   );
-} 
+}
