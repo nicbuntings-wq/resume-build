@@ -281,7 +281,7 @@ export function OptimizedSubscriptionPage({ initialProfile }: OptimizedSubscript
                 </div>
                 
                 <div className="mb-4">
-                  <span className="text-4xl font-bold text-gray-900">$20</span>
+                  <span className="text-4xl font-bold text-gray-900">$30</span>
                   <span className="text-gray-600">/month</span>
                 </div>
                 
