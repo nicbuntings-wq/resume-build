@@ -19,7 +19,7 @@ import { ModelShowcase } from "@/components/landing/model-showcase";
 export const metadata: Metadata = {
   title: "Login | Cyme.AI - AI-Powered Resume Builder",
   description: "Create tailored, ATS-optimized resumes powered by AI. Cyme.AI helps you land your dream tech job with personalized resume optimization.",
-  keywords: ["resume builder", "AI resume", "ATS optimization", "tech jobs", "career tools", "job application"],
+  keywords: ["resume builder", "AI resume", "ATS optimization", "jobs", "career tools", "job application"],
   authors: [{ name: "Cyme.AI" }],
   openGraph: {
     title: "Cyme.AI - AI-Powered Resume Builder",
