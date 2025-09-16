@@ -15,7 +15,7 @@ export function Hero() {
         
         {/* Description with quantifiable benefits */}
         <p className="text-lg md:text-xl text-muted-foreground max-w-md">
-          Create ATS-optimized tech resumes in under 10 minutes. 3x your interview chances with AI-powered resume tailoring.
+          Create ATS-optimized resumes in under 10 minutes. 3x your interview chances with AI-powered resume tailoring.
         </p>
         
         {/* CTAs with simplified effects */}
