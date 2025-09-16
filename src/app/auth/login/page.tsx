@@ -18,12 +18,12 @@ import { ModelShowcase } from "@/components/landing/model-showcase";
 
 export const metadata: Metadata = {
   title: "Login | Cyme.AI - AI-Powered Resume Builder",
-  description: "Create tailored, ATS-optimized resumes powered by AI. Cyme.AI helps you land your dream tech job with personalized resume optimization.",
+  description: "Create tailored, ATS-optimized resumes powered by AI. Cyme.AI helps you land your dream job with personalized resume optimization.",
   keywords: ["resume builder", "AI resume", "ATS optimization", "jobs", "career tools", "job application"],
   authors: [{ name: "Cyme.AI" }],
   openGraph: {
     title: "Cyme.AI - AI-Powered Resume Builder",
-    description: "Create tailored, ATS-optimized resumes powered by AI. Land your dream tech job with personalized resume optimization.",
+    description: "Create tailored, ATS-optimized resumes powered by AI. Land your dream job with personalized resume optimization.",
     url: "https://cyme.ai//",
     siteName: "Cyme.AI",
     images: [
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Cyme.AI - AI-Powered Resume Builder",
-    description: "Create tailored, ATS-optimized resumes powered by AI. Land your dream tech job with personalized resume optimization.",
+    description: "Create tailored, ATS-optimized resumes powered by AI. Land your dream job with personalized resume optimization.",
     images: ["/og.webp"],
     creator: "@resumelm",
   },
@@ -146,7 +146,7 @@ export default async function LoginPage({
                       <br />
                       <span className="relative inline-block">
                         <span className="inline-block bg-gradient-to-r from-violet-500/90 via-blue-500/90 to-violet-500/90 bg-clip-text text-transparent animate-gradient-x">
-                          that lands you tech jobs
+                          that lands you jobs
                         </span>
                         <div className="absolute -bottom-2 left-0 w-24 sm:w-32 h-1.5 bg-gradient-to-r from-violet-500 to-blue-500 rounded-full" />
                       </span>
