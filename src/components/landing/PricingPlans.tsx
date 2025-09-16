@@ -37,7 +37,7 @@ export function PricingPlans() {
       features: [
         { text: "Use your own API keys" },
         { text: "2 base resumes" },
-        { text: "5 tailored resumes" },
+        { text: "Unlimited editing & downloads" },
       ],
       ctaText: "Get Started",
       ctaLink: "/auth/register",
