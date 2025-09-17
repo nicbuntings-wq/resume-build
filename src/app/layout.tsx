@@ -39,14 +39,17 @@ export const metadata: Metadata = {
   creator: "Cyme.AI",
   publisher: "Cyme.AI",
   formatDetection: { email: false, address: false, telephone: false },
-  icons: {
+    icons: {
+    // Browsers + Google’s crawler both discover these
     icon: [
-      { url: "/favicon-48x48.png", sizes: "48x48", type: "image/png" },
-      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon.ico", sizes: "any", type: "image/x-icon" },          // root .ico (critical for Google)
+      { url: "/favicon.svg", type: "image/svg+xml" },                       // scalable
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },     // fallbacks
       { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
-      { url: "/favicon.ico", sizes: "any", type: "image/x-icon" },
+      { url: "/favicon-48x48.png", sizes: "48x48", type: "image/png" },
     ],
-    apple: "/apple-touch-icon.png",
+    shortcut: "/favicon.ico",            // adds <link rel="shortcut icon">
+    apple: "/apple-touch-icon.png",      // iOS home-screen icon (180x180)
   },
   openGraph: {
     type: "website",
