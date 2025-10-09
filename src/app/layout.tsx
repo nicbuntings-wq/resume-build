@@ -10,6 +10,7 @@ import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/react";
 import Link from "next/link";
 import { cookies } from "next/headers";
+import Script from "next/script"; // 👈 NEW LINE
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -39,17 +40,16 @@ export const metadata: Metadata = {
   creator: "Cyme.AI",
   publisher: "Cyme.AI",
   formatDetection: { email: false, address: false, telephone: false },
-    icons: {
-    // Browsers + Google’s crawler both discover these
+  icons: {
     icon: [
-      { url: "/favicon.ico", sizes: "any", type: "image/x-icon" },          // root .ico (critical for Google)
-      { url: "/favicon.svg", type: "image/svg+xml" },                       // scalable
-      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },     // fallbacks
+      { url: "/favicon.ico", sizes: "any", type: "image/x-icon" },
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
       { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
       { url: "/favicon-48x48.png", sizes: "48x48", type: "image/png" },
     ],
-    shortcut: "/favicon.ico",            // adds <link rel="shortcut icon">
-    apple: "/apple-touch-icon.png",      // iOS home-screen icon (180x180)
+    shortcut: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
   },
   openGraph: {
     type: "website",
@@ -59,7 +59,7 @@ export const metadata: Metadata = {
       "Create tailored, ATS-optimized resumes powered by AI. Land your dream job with personalized resume optimization.",
     images: [
       {
-        url: `${BASE_URL}/og-1200x630.png`, // PNG: better for SMS/iMessage/WhatsApp
+        url: `${BASE_URL}/og-1200x630.png`,
         width: 1200,
         height: 630,
         alt: "Cyme.AI — AI Resume Builder",
@@ -161,6 +161,18 @@ export default async function RootLayout({
               maxWidth: "500px",
             },
           }}
+        />
+
+        {/* 👇 NEW: Rewardful scripts */}
+        <Script id="rewardful-queue" strategy="beforeInteractive">
+          {`(function(w,r){w._rwq=r;w[r]=w[r]||function(){
+              (w[r].q=w[r].q||[]).push(arguments)
+            }})(window,'rewardful');`}
+        </Script>
+        <Script
+          src="https://r.wdfl.co/rw.js"
+          data-rewardful="a4b8a2" // <-- replace with your Rewardful public key
+          strategy="afterInteractive"
         />
       </body>
     </html>
