@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useCallback } from "react";
+import React, { useCallback, useRef, useEffect } from "react"; // 👈 added useRef, useEffect
 import { loadStripe } from "@stripe/stripe-js";
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js";
 import { useSearchParams } from 'next/navigation'
@@ -33,8 +33,24 @@ export function CheckoutForm() {
     const searchParams = useSearchParams()
     const priceId = searchParams.get('price_id')!
 
+    // 👇 NEW: store referral ID
+    const referralRef = useRef<string | null>(null);
+
+    // 👇 NEW: grab referral once Rewardful is ready
+    useEffect(() => {
+        if (typeof window === "undefined") return;
+        const w = window as any;
+        if (!w.rewardful) return;
+        w.rewardful("ready", function () {
+            referralRef.current = w.Rewardful?.referral ?? null;
+        });
+    }, []);
+
     const fetchClientSecret = useCallback(async () => {
-        const stripeResponse = await postStripeSession({ priceId });
+        const stripeResponse = await postStripeSession({
+            priceId,
+            referral: referralRef.current, // 👈 NEW: pass referral along
+        });
         return stripeResponse.clientSecret;
     }, [priceId]);
 
@@ -115,4 +131,3 @@ export function CheckoutForm() {
         </div>
     );
 }
-
