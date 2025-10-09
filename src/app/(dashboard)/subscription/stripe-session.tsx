@@ -9,10 +9,11 @@ const stripe = new Stripe(apiKey);
 
 interface NewSessionOptions {
     priceId: string;
+    referral?: string | null; // 👈 NEW
 }
 
 // Function to create a Stripe Checkout Session
-export const postStripeSession = async ({ priceId }: NewSessionOptions) => {
+export const postStripeSession = async ({ priceId, referral }: NewSessionOptions) => { // 👈 updated to accept referral
     // Check if user is authenticated
     const { authenticated, user } = await checkAuth();
     
@@ -41,6 +42,10 @@ export const postStripeSession = async ({ priceId }: NewSessionOptions) => {
             mode: "subscription",
             allow_promotion_codes: true,
             return_url: returnUrl,
+
+            // 👇 NEW: Rewardful integration
+            client_reference_id: referral ?? undefined,
+            metadata: referral ? { referral } : undefined,
         });
 
         if (!session.client_secret) {
