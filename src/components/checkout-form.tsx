@@ -7,6 +7,13 @@ import { useSearchParams } from 'next/navigation'
 
 import { postStripeSession } from "@/app/(dashboard)/subscription/stripe-session";
 
+declare global {
+  interface Window {
+    rewardful?: (cmd: string, cb?: () => void) => void;
+    Rewardful?: { referral?: string };
+  }
+}
+
 const stripePromise = loadStripe(
     process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY as string,
 );
@@ -39,10 +46,9 @@ export function CheckoutForm() {
     // 👇 NEW: grab referral once Rewardful is ready
     useEffect(() => {
         if (typeof window === "undefined") return;
-        const w = window as any;
-        if (!w.rewardful) return;
-        w.rewardful("ready", function () {
-            referralRef.current = w.Rewardful?.referral ?? null;
+        if (!window.rewardful) return;
+        window.rewardful("ready", function () {
+            referralRef.current = window.Rewardful?.referral ?? null;
         });
     }, []);
 
