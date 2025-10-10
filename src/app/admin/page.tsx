@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 // Removed getUserId import
 import UsersTable from "./components/users-table";
 import {
