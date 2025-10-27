@@ -107,7 +107,7 @@ export default function ScorerEmbedPage() {
       </div>
 
       {/* Results */}
-{!!data && (
+      {data ? (
         <div style={{ maxWidth: 900, margin: '0 auto', display: 'grid', gap: 12, gridTemplateColumns: '1fr 1fr' }}>
           {/* Overall */}
           <div style={{ background: '#fff', border: '1px solid #e9edf2', borderRadius: 16, padding: 16 }}>
@@ -116,15 +116,15 @@ export default function ScorerEmbedPage() {
                 <svg viewBox="0 0 120 120" style={{ width: '100%', height: '100%', transform: 'rotate(-90deg)' }}>
                   <circle cx="60" cy="60" r="52" fill="none" stroke="#eef2f7" strokeWidth="12" />
                   <circle cx="60" cy="60" r="52" fill="none" stroke="#0ea5e9" strokeWidth="12" strokeLinecap="round"
-                          strokeDasharray={ringDash(data?.overallScore?.score ?? 0)} />
+                          strokeDasharray={ringDash(data.overallScore?.score ?? 0)} />
                 </svg>
                 <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 24 }}>
-                  {Math.max(0, Math.min(100, Number(data?.overallScore?.score || 0)))}
+                  {Math.max(0, Math.min(100, Number(data.overallScore?.score || 0)))}
                 </div>
               </div>
               <div>
                 <div style={{ color: '#64748b', fontSize: 13 }}>Overall Score</div>
-                <div style={{ marginTop: 6, fontSize: 14, lineHeight: 1.4 }}>{data?.overallScore?.reason || ''}</div>
+                <div style={{ marginTop: 6, fontSize: 14, lineHeight: 1.4 }}>{data.overallScore?.reason || ''}</div>
               </div>
             </div>
           </div>
@@ -132,28 +132,34 @@ export default function ScorerEmbedPage() {
           {/* Quick Summary */}
           <div style={{ background: '#fff', border: '1px solid #e9edf2', borderRadius: 16, padding: 16 }}>
             <h4 style={{ margin: '0 0 8px', fontSize: 15 }}>Quick Summary</h4>
-            <div><span style={{ color: '#64748b' }}>Completeness:</span> {data?.completeness?.score ?? '—'} {data?.completeness?.reason ? `— ${data?.completeness?.reason}` : ''}</div>
-            <div style={{ marginTop: 4 }}><span style={{ color: '#64748b' }}>Impact:</span> {data?.impactScore?.score ?? '—'} {data?.impactScore?.reason ? `— ${data?.impactScore?.reason}` : ''}</div>
-            <div style={{ marginTop: 4 }}><span style={{ color: '#64748b' }}>Tailored:</span> {data?.isTailoredResume ? 'Yes' : 'No'}</div>
+            <div><span style={{ color: '#64748b' }}>Completeness:</span> {data.completeness?.score ?? '—'} {data.completeness?.reason ? `— ${data.completeness?.reason}` : ''}</div>
+            <div style={{ marginTop: 4 }}><span style={{ color: '#64748b' }}>Impact:</span> {data.impactScore?.score ?? '—'} {data.impactScore?.reason ? `— ${data.impactScore?.reason}` : ''}</div>
+            <div style={{ marginTop: 4 }}><span style={{ color: '#64748b' }}>Tailored:</span> {data.isTailoredResume ? 'Yes' : 'No'}</div>
           </div>
 
           {/* Completeness */}
           <div style={{ background: '#fff', border: '1px solid #e9edf2', borderRadius: 16, padding: 16 }}>
             <h4 style={{ margin: '0 0 8px', fontSize: 15 }}>Completeness</h4>
-            <pre style={{ whiteSpace: 'pre-wrap', margin: 0, color: '#64748b' }}>{JSON.stringify(data?.completeness, null, 2)}</pre>
+            <pre style={{ whiteSpace: 'pre-wrap', margin: 0, color: '#64748b' }}>
+              {JSON.stringify(data.completeness ?? null, null, 2)}
+            </pre>
           </div>
 
           {/* Impact */}
           <div style={{ background: '#fff', border: '1px solid #e9edf2', borderRadius: 16, padding: 16 }}>
             <h4 style={{ margin: '0 0 8px', fontSize: 15 }}>Impact</h4>
-            <pre style={{ whiteSpace: 'pre-wrap', margin: 0, color: '#64748b' }}>{JSON.stringify(data?.impactScore, null, 2)}</pre>
+            <pre style={{ whiteSpace: 'pre-wrap', margin: 0, color: '#64748b' }}>
+              {JSON.stringify(data.impactScore ?? null, null, 2)}
+            </pre>
           </div>
 
           {/* Job Alignment */}
-          {data?.jobAlignment && (
+          {data.jobAlignment && (
             <div style={{ gridColumn: '1 / -1', background: '#fff', border: '1px solid #e9edf2', borderRadius: 16, padding: 16 }}>
               <h4 style={{ margin: '0 0 8px', fontSize: 15 }}>Job Alignment</h4>
-              <pre style={{ whiteSpace: 'pre-wrap', margin: 0, color: '#64748b' }}>{JSON.stringify(data?.jobAlignment, null, 2)}</pre>
+              <pre style={{ whiteSpace: 'pre-wrap', margin: 0, color: '#64748b' }}>
+                {JSON.stringify(data.jobAlignment, null, 2)}
+              </pre>
             </div>
           )}
 
@@ -161,7 +167,7 @@ export default function ScorerEmbedPage() {
           <div style={{ gridColumn: '1 / -1', background: '#fff', border: '1px solid #e9edf2', borderRadius: 16, padding: 16 }}>
             <h4 style={{ margin: '0 0 8px', fontSize: 15 }}>Overall Improvements</h4>
             <ul style={{ margin: '8px 0 0 18px' }}>
-              {(Array.isArray(data?.overallImprovements) ? data!.overallImprovements : []).map((it: ImprovementItem, i: number) => (
+              {(data?.overallImprovements ?? []).map((it: ImprovementItem, i: number) => (
                 <li key={i} style={{ margin: '4px 0' }}>
                   {typeof it === 'string' ? it : (it?.text ?? JSON.stringify(it))}
                 </li>
@@ -172,10 +178,12 @@ export default function ScorerEmbedPage() {
           {/* Misc */}
           <div style={{ gridColumn: '1 / -1', background: '#fff', border: '1px solid #e9edf2', borderRadius: 16, padding: 16 }}>
             <h4 style={{ margin: '0 0 8px', fontSize: 15 }}>Miscellaneous Metrics</h4>
-            <pre style={{ whiteSpace: 'pre-wrap', margin: 0, color: '#64748b' }}>{JSON.stringify(data?.miscellaneous, null, 2)}</pre>
+            <pre style={{ whiteSpace: 'pre-wrap', margin: 0, color: '#64748b' }}>
+              {JSON.stringify(data.miscellaneous ?? null, null, 2)}
+            </pre>
           </div>
         </div>
-      )}
+      ) : null}
     </div>
   );
 }
