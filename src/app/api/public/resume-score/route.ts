@@ -1,29 +1,25 @@
-// src/app/api/public/resume-score/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-
-// Reuse your existing schema & AI client helper:
 import { resumeScoreSchema } from "@/lib/zod-schemas";
 import { initializeAIClient, type AIConfig } from "@/utils/ai-tools";
 
 const Body = z.object({
-  resume: z.any(),                 // e.g., { raw_text: string, is_base_resume: boolean }
-  job: z.any().nullish(),          // e.g., { description: string } | null
+  resume: z.any(),
+  job: z.any().nullish(),
 });
 
-export const runtime = "edge";     // fast cold starts (optional)
+export const runtime = "edge";
 
 export async function POST(req: NextRequest) {
   try {
     const json = await req.json();
     const { resume, job } = Body.parse(json);
 
-    // Initialize your AI client (uses your server-side key via your helper).
+    // Keep the type explicit (no `any`)
     const aiClient = initializeAIClient({
       model: process.env.CYME_PUBLIC_SCORER_MODEL || undefined,
     } as AIConfig);
 
-    // Build the prompt (mirror your internal approach).
     let prompt = `
       You are scoring a resume. Return JSON that matches resumeScoreSchema exactly.
       Resume JSON: ${JSON.stringify(resume)}
@@ -46,7 +42,7 @@ export async function POST(req: NextRequest) {
       prompt += `\nThis is a base resume. Set isTailoredResume=false and omit jobAlignment.\n`;
     }
 
-    // Structured output (same shape your app expects):
+    // Structured output (no `any`)
     const { object } = await (await import("ai")).generateObject({
       model: aiClient,
       schema: resumeScoreSchema,
@@ -54,7 +50,8 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json(object, { headers: { "Cache-Control": "no-store" } });
-  } catch (e: any) {
-    return NextResponse.json({ error: e?.message || "Bad Request" }, { status: 400 });
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : "Bad Request";
+    return NextResponse.json({ error: message }, { status: 400 });
   }
 }
