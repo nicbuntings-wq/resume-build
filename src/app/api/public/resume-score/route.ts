@@ -1,26 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { resumeScoreSchema } from "@/lib/zod-schemas";
-import { initializeAIClient, type AIConfig } from "@/utils/ai-tools";
+import { openai } from "@ai-sdk/openai";
+import { generateObject } from "ai";
+
+export const runtime = "edge";
 
 const Body = z.object({
   resume: z.any(),
   job: z.any().nullish(),
 });
 
-export const runtime = "edge";
-
 export async function POST(req: NextRequest) {
   try {
     const json = await req.json();
     const { resume, job } = Body.parse(json);
 
-    // ✅ Use env if present, otherwise hard-default to gpt-4o-mini
-    const modelId =
-      process.env.CYME_PUBLIC_SCORER_MODEL ?? "gpt-4o-mini";
-
-    // OPENAI_API_KEY must be set in Vercel; initializeAIClient will use it
-    const aiClient = initializeAIClient({ model: modelId } as AIConfig);
+    // ✅ Hard-set the model; Vercel AI SDK will read OPENAI_API_KEY for you
+    const model = openai("gpt-4o-mini");
 
     let prompt = `
       You are scoring a resume. Return JSON that matches resumeScoreSchema exactly.
@@ -30,6 +27,7 @@ export async function POST(req: NextRequest) {
         "metricName": { "score": number, "reason": "string" }
       }
     `;
+
     if (job) {
       prompt += `
       This is a tailored resume. Job JSON: ${JSON.stringify(job)}
@@ -44,8 +42,8 @@ export async function POST(req: NextRequest) {
       prompt += `\nThis is a base resume. Set isTailoredResume=false and omit jobAlignment.\n`;
     }
 
-    const { object } = await (await import("ai")).generateObject({
-      model: aiClient,
+    const { object } = await generateObject({
+      model,
       schema: resumeScoreSchema,
       prompt,
     });
@@ -56,7 +54,7 @@ export async function POST(req: NextRequest) {
   } catch (e: unknown) {
     const message = e instanceof Error ? e.message : "Bad Request";
     return NextResponse.json(
-      { error: message, hint: "Ensure OPENAI_API_KEY is set; model defaults to gpt-4o-mini" },
+      { error: message, hint: "Model is hard-set to gpt-4o-mini; ensure OPENAI_API_KEY is present." },
       { status: 400 }
     );
   }
