@@ -1,14 +1,34 @@
-// app/embed/scorer/page.tsx
 'use client';
 
 import * as React from 'react';
+
+// ------- minimal types to keep the linter happy -------
+type ScoreReason = {
+  score?: number;
+  reason?: string;
+  // allow extra keys from model output without using `any`
+  [k: string]: unknown;
+};
+
+type ImprovementItem = string | { text?: string };
+
+type ResumeScore = {
+  overallScore?: { score?: number; reason?: string };
+  completeness?: ScoreReason;
+  impactScore?: ScoreReason;
+  isTailoredResume?: boolean;
+  jobAlignment?: unknown; // we only `JSON.stringify` it
+  overallImprovements?: ImprovementItem[];
+  miscellaneous?: Record<string, ScoreReason>;
+};
+// ------------------------------------------------------
 
 export default function ScorerEmbedPage() {
   const [resume, setResume] = React.useState('');
   const [job, setJob] = React.useState('');
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
-  const [data, setData] = React.useState<any>(null);
+  const [data, setData] = React.useState<ResumeScore | null>(null);
 
   React.useEffect(() => {
     // resize message to parent iframe (optional)
@@ -37,15 +57,23 @@ export default function ScorerEmbedPage() {
         body: JSON.stringify(body),
         cache: 'no-store',
       });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json?.error || 'Failed to score');
-      setData(json);
-    } catch (e: any) {
-      setError(e?.message || 'Error');
+      const json: ResumeScore | { error?: string } = await res.json();
+      if (!res.ok) throw new Error((json as { error?: string })?.error || 'Failed to score');
+      setData(json as ResumeScore);
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : 'Error';
+      setError(message);
       setData(null);
     } finally {
       setLoading(false);
     }
+  };
+
+  const ringDash = (n: number) => {
+    const clamped = Math.max(0, Math.min(100, Number(n || 0)));
+    const r = 52;
+    const C = 2 * Math.PI * r;
+    return `${(clamped / 100) * C} ${C}`;
   };
 
   return (
@@ -88,7 +116,7 @@ export default function ScorerEmbedPage() {
                 <svg viewBox="0 0 120 120" style={{ width: '100%', height: '100%', transform: 'rotate(-90deg)' }}>
                   <circle cx="60" cy="60" r="52" fill="none" stroke="#eef2f7" strokeWidth="12" />
                   <circle cx="60" cy="60" r="52" fill="none" stroke="#0ea5e9" strokeWidth="12" strokeLinecap="round"
-                          strokeDasharray={`${(Math.max(0, Math.min(100, Number(data?.overallScore?.score || 0))) / 100) * (2 * Math.PI * 52)} ${2 * Math.PI * 52}`} />
+                          strokeDasharray={ringDash(data?.overallScore?.score ?? 0)} />
                 </svg>
                 <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 24 }}>
                   {Math.max(0, Math.min(100, Number(data?.overallScore?.score || 0)))}
@@ -133,8 +161,10 @@ export default function ScorerEmbedPage() {
           <div style={{ gridColumn: '1 / -1', background: '#fff', border: '1px solid #e9edf2', borderRadius: 16, padding: 16 }}>
             <h4 style={{ margin: '0 0 8px', fontSize: 15 }}>Overall Improvements</h4>
             <ul style={{ margin: '8px 0 0 18px' }}>
-              {(Array.isArray(data?.overallImprovements) ? data!.overallImprovements : []).map((it: any, i: number) => (
-                <li key={i} style={{ margin: '4px 0' }}>{typeof it === 'string' ? it : it?.text ?? JSON.stringify(it)}</li>
+              {(Array.isArray(data?.overallImprovements) ? data!.overallImprovements : []).map((it: ImprovementItem, i: number) => (
+                <li key={i} style={{ margin: '4px 0' }}>
+                  {typeof it === 'string' ? it : (it?.text ?? JSON.stringify(it))}
+                </li>
               ))}
             </ul>
           </div>
