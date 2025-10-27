@@ -2,6 +2,12 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function updateSession(request: NextRequest) {
+  // ✅ BYPASS for public embed UI and public scorer API
+  const p = request.nextUrl.pathname
+  if (p.startsWith('/embed/') || p.startsWith('/api/public/')) {
+    return NextResponse.next({ request })
+  }
+
   // Debug logging
   console.log('🔍 Middleware running on:', request.nextUrl.pathname)
   
