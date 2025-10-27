@@ -154,7 +154,7 @@ export default function ScorerEmbedPage() {
           </div>
 
           {/* Job Alignment */}
-          {data.jobAlignment && (
+          {Boolean(data.jobAlignment) && (
             <div style={{ gridColumn: '1 / -1', background: '#fff', border: '1px solid #e9edf2', borderRadius: 16, padding: 16 }}>
               <h4 style={{ margin: '0 0 8px', fontSize: 15 }}>Job Alignment</h4>
               <pre style={{ whiteSpace: 'pre-wrap', margin: 0, color: '#64748b' }}>
