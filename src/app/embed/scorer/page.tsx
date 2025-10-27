@@ -1,18 +1,21 @@
 'use client';
 
 import * as React from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { RefreshCw, TrendingUp, Target, Award } from 'lucide-react';
+import { RefreshCw, TrendingUp, Target, Award, UploadCloud, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 // ---------- Types aligned to resumeScoreSchema ----------
 type ScoreNode = { score: number; reason: string };
+
+// ----- PDF Upload helpers -----
+type DragEvt = React.DragEvent<HTMLDivElement>;
 
 type JobAlignmentNode = {
   score: number;
@@ -71,6 +74,9 @@ export default function ScorerEmbedPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<ResumeScoreResponse | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [dragActive, setDragActive] = useState(false);
+  const [pdfLoading, setPdfLoading] = useState(false);
 
   // Resize the iframe height automatically for nicer embeds
   useEffect(() => {
@@ -84,6 +90,38 @@ export default function ScorerEmbedPage() {
     return () => ro.disconnect();
   }, []);
 
+    // Extract text from a PDF client-side using pdfjs-dist (dynamic import to avoid SSR issues)
+  const extractTextFromPdf = async (file: File): Promise<string> => {
+    setPdfLoading(true);
+    try {
+      // ESM build for Next 15; dynamic import keeps worker bundling sane
+      const pdfjsLib = await import('pdfjs-dist/build/pdf.mjs');
+      // @ts-ignore - worker is resolved by bundler
+      const pdfjsWorker = await import('pdfjs-dist/build/pdf.worker.mjs');
+      (pdfjsLib as any).GlobalWorkerOptions.workerSrc = pdfjsWorker;
+
+      const buf = await file.arrayBuffer();
+      const pdf = await (pdfjsLib as any).getDocument({ data: buf }).promise;
+
+      let fullText = '';
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const content = await page.getTextContent();
+        const strings = content.items.map((it: any) => ('str' in it ? it.str : '')).filter(Boolean);
+        fullText += strings.join(' ') + '\n';
+      }
+      return fullText.trim();
+    } finally {
+      setPdfLoading(false);
+    }
+  };
+
+  const handlePdfFile = async (file: File) => {
+    if (!file || file.type !== 'application/pdf') return;
+    const text = await extractTextFromPdf(file);
+    if (text) setResume(text);
+  };
+  
   const onScore = async () => {
     setError(null);
     if (!resume.trim()) {
@@ -239,32 +277,88 @@ export default function ScorerEmbedPage() {
       {/* Input block (keep anonymous flow) */}
       <Card>
         <CardContent className="p-4">
-          <h3 className="text-base font-semibold mb-2">Resume Scorer</h3>
-          <p className="text-sm text-muted-foreground mb-3">Paste resume (and optional job) for an instant score.</p>
+         <h3 className="text-lg font-semibold mb-1">Import Resume Content To Get Your Score</h3>
+<p className="text-sm text-muted-foreground mb-4">
+  Upload your PDF resume <span className="font-medium">or</span> paste the text below. Optionally add a job description for a tailored score.
+</p>
 
-          <div className="grid gap-3">
-            <textarea
-              rows={8}
-              placeholder="Paste resume text here…"
-              value={resume}
-              onChange={(e) => setResume(e.target.value)}
-              className="w-full rounded-xl border border-slate-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-300"
-            />
-            <textarea
-              rows={5}
-              placeholder="(Optional) paste job description here…"
-              value={job}
-              onChange={(e) => setJob(e.target.value)}
-              className="w-full rounded-xl border border-slate-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-300"
-            />
-          </div>
+         <div className="grid gap-3">
+  {/* Hidden file input */}
+  <input
+    ref={fileInputRef}
+    type="file"
+    accept="application/pdf"
+    className="hidden"
+    onChange={async (e) => {
+      const f = e.target.files?.[0];
+      if (f) await handlePdfFile(f);
+      e.currentTarget.value = '';
+    }}
+  />
 
+  {/* Drop zone */}
+  <div
+    onClick={() => fileInputRef.current?.click()}
+    onDragOver={(e: DragEvt) => {
+      e.preventDefault();
+      setDragActive(true);
+    }}
+    onDragLeave={() => setDragActive(false)}
+    onDrop={async (e: DragEvt) => {
+      e.preventDefault();
+      setDragActive(false);
+      const f = e.dataTransfer.files?.[0];
+      if (f) await handlePdfFile(f);
+    }}
+    className={cn(
+      'rounded-xl border-2 border-dashed cursor-pointer transition-colors',
+      dragActive ? 'border-violet-500 bg-violet-50/70' : 'border-violet-300 bg-violet-50/40 hover:bg-violet-50'
+    )}
+  >
+    <div className="flex flex-col items-center justify-center gap-2 px-6 py-10 text-center">
+      {pdfLoading ? (
+        <Loader2 className="h-6 w-6 animate-spin text-violet-600" />
+      ) : (
+        <UploadCloud className="h-6 w-6 text-violet-600" />
+      )}
+      <div className="text-sm">
+        <span className="font-medium text-violet-700">Drop your PDF resume here</span>{' '}
+        <span className="text-muted-foreground">or click to browse files</span>
+      </div>
+      <div className="text-xs text-muted-foreground">.pdf only • We’ll extract the text automatically</div>
+    </div>
+  </div>
+
+  {/* Paste-text fallback */}
+  <div className="space-y-1">
+    <label className="text-xs font-medium text-slate-500">Or paste your resume text here</label>
+    <textarea
+      rows={8}
+      placeholder="Start pasting your resume content here…"
+      value={resume}
+      onChange={(e) => setResume(e.target.value)}
+      className="w-full rounded-xl border border-slate-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-300"
+    />
+  </div>
+
+  {/* Optional Job Description */}
+  <div className="space-y-1">
+    <label className="text-xs font-medium text-slate-500">(Optional) paste job description</label>
+    <textarea
+      rows={5}
+      placeholder="Paste the job description if you want a tailored alignment score…"
+      value={job}
+      onChange={(e) => setJob(e.target.value)}
+      className="w-full rounded-xl border border-slate-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-300"
+    />
+  </div>
+</div>
           <div className="flex items-center gap-3 mt-3">
-            <Button onClick={onScore} disabled={loading}>
+            <Button onClick={onScore} disabled={loading || (!resume.trim() && !job.trim())}>
               <RefreshCw className={cn('mr-2 h-4 w-4', loading && 'animate-spin')} />
               {loading ? 'Scoring…' : 'Score Resume'}
             </Button>
-            {error && <span className="text-red-600 font-medium text-sm">{error}</span>}
+            {error && <span className="text-red-600 font-medium text-sm">Oops — {error}</span>}
           </div>
         </CardContent>
       </Card>
