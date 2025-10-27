@@ -366,9 +366,10 @@ export default function ScorerEmbedPage() {
               </CardHeader>
               <CardContent className="pt-0">
                 <div className="space-y-4">
-                  {Object.entries(data.jobAlignment).map(([label, node]) => (
-                    <JobAlignmentItem key={label} label={label} data={node as JobAlignmentNode} />
-                  ))}
+                  {(Object.entries(data.jobAlignment ?? {}) as [string, JobAlignmentNode][])
+  .map(([label, node]) => (
+    <JobAlignmentItem key={label} label={label} data={node} />
+  ))}
                 </div>
               </CardContent>
             </Card>
@@ -396,9 +397,15 @@ export default function ScorerEmbedPage() {
                 </CardHeader>
                 <CardContent className="pt-0">
                   <div className="space-y-4">
-                    {Object.entries(metrics).map(([label, node]) => (
-                      <ScoreItem key={label} label={label} score={(node as ScoreNode).score} reason={(node as ScoreNode).reason} />
-                    ))}
+                    {(Object.entries(metrics ?? {}) as [string, ScoreNode][])
+  .map(([label, node]) => (
+    <ScoreItem 
+      key={label} 
+      label={label} 
+      score={node.score} 
+      reason={node.reason} 
+    />
+  ))}
                   </div>
                 </CardContent>
               </Card>
