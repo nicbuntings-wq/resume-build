@@ -107,7 +107,7 @@ export default function ScorerEmbedPage() {
       </div>
 
       {/* Results */}
-      {data && (
+{!!data && (
         <div style={{ maxWidth: 900, margin: '0 auto', display: 'grid', gap: 12, gridTemplateColumns: '1fr 1fr' }}>
           {/* Overall */}
           <div style={{ background: '#fff', border: '1px solid #e9edf2', borderRadius: 16, padding: 16 }}>
