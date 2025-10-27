@@ -378,14 +378,14 @@ export default function ScorerEmbedPage() {
           {/* Detailed Metrics */}
           {(() => {
             const sections: Array<{
-              title: string;
-              icon: React.ComponentType<{ className?: string }>;
-              metrics: Record<string, ScoreNode>;
-            }> = [
-              { title: 'Completeness', icon: Award as any, metrics: data.completeness },
-              { title: 'Impact Score', icon: TrendingUp as any, metrics: data.impactScore },
-              { title: 'Role Match', icon: Target as any, metrics: data.roleMatch },
-            ];
+  title: string;
+  icon: React.ComponentType<{ className?: string }>;
+  metrics: Record<string, ScoreNode>;
+}> = [
+  { title: 'Completeness', icon: Award, metrics: data.completeness },
+  { title: 'Impact Score', icon: TrendingUp, metrics: data.impactScore },
+  { title: 'Role Match', icon: Target, metrics: data.roleMatch },
+];
 
             return sections.map(({ title, icon: Icon, metrics }) => (
               <Card key={title}>
