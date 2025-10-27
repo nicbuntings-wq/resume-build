@@ -90,24 +90,37 @@ export default function ScorerEmbedPage() {
     return () => ro.disconnect();
   }, []);
 
-    // Extract text from a PDF client-side using pdfjs-dist (dynamic import to avoid SSR issues)
+      // Minimal local types so we don't use `any`
+  type PDFTextItem = { str?: string };
+  type PDFTextContent = { items: PDFTextItem[] };
+  type PDFPageProxy = { getTextContent: () => Promise<PDFTextContent> };
+  type PDFDocumentProxy = { numPages: number; getPage: (n: number) => Promise<PDFPageProxy> };
+  type PDFJSLite = {
+    GlobalWorkerOptions: { workerSrc: unknown };
+    getDocument: (opts: { data: ArrayBuffer }) => { promise: Promise<PDFDocumentProxy> };
+  };
+
+  // Extract text from a PDF client-side using pdfjs-dist (dynamic import to avoid SSR issues)
   const extractTextFromPdf = async (file: File): Promise<string> => {
     setPdfLoading(true);
     try {
       // ESM build for Next 15; dynamic import keeps worker bundling sane
-      const pdfjsLib = await import('pdfjs-dist/build/pdf.mjs');
-      // @ts-ignore - worker is resolved by bundler
-      const pdfjsWorker = await import('pdfjs-dist/build/pdf.worker.mjs');
-      (pdfjsLib as any).GlobalWorkerOptions.workerSrc = pdfjsWorker;
+      const pdfjsLib = (await import('pdfjs-dist/build/pdf.mjs')) as unknown as PDFJSLite;
+      // The worker module exports a value the library accepts as workerSrc. Typing is opaque,
+      // so we intentionally expect a TS error here.
+      // @ts-expect-error: pdfjs worker module provides a URL/object acceptable to workerSrc
+      pdfjsLib.GlobalWorkerOptions.workerSrc = await import('pdfjs-dist/build/pdf.worker.mjs');
 
       const buf = await file.arrayBuffer();
-      const pdf = await (pdfjsLib as any).getDocument({ data: buf }).promise;
+      const pdf = (await pdfjsLib.getDocument({ data: buf }).promise) as PDFDocumentProxy;
 
       let fullText = '';
       for (let i = 1; i <= pdf.numPages; i++) {
         const page = await pdf.getPage(i);
         const content = await page.getTextContent();
-        const strings = content.items.map((it: any) => ('str' in it ? it.str : '')).filter(Boolean);
+        const strings = content.items
+          .map((it) => (typeof it?.str === 'string' ? it.str : ''))
+          .filter((s): s is string => Boolean(s));
         fullText += strings.join(' ') + '\n';
       }
       return fullText.trim();
