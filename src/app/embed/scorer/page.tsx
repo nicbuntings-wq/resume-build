@@ -1,37 +1,79 @@
 'use client';
 
 import * as React from 'react';
+import { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
+import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
+import 'react-circular-progressbar/dist/styles.css';
 
-// ------- minimal types to keep the linter happy -------
-type ScoreReason = {
-  score?: number;
-  reason?: string;
-  // allow extra keys from model output without using `any`
-  [k: string]: unknown;
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { RefreshCw, TrendingUp, Target, Award } from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+// ---------- Types aligned to resumeScoreSchema ----------
+type ScoreNode = { score: number; reason: string };
+
+type JobAlignmentNode = {
+  score: number;
+  reason: string;
+  matchedKeywords?: string[];
+  missingKeywords?: string[];
+  matchedRequirements?: string[];
+  gapAnalysis?: string[];
+  suggestions?: string[];
 };
 
-type ImprovementItem = string | { text?: string };
+type ResumeScoreResponse = {
+  overallScore: ScoreNode;
 
-type ResumeScore = {
-  overallScore?: { score?: number; reason?: string };
-  completeness?: ScoreReason;
-  impactScore?: ScoreReason;
+  completeness: {
+    contactInformation: ScoreNode;
+    detailLevel: ScoreNode;
+  };
+
+  impactScore: {
+    activeVoiceUsage: ScoreNode;
+    quantifiedAchievements: ScoreNode;
+  };
+
+  roleMatch: {
+    skillsRelevance: ScoreNode;
+    experienceAlignment: ScoreNode;
+    educationFit: ScoreNode;
+  };
+
+  jobAlignment?: {
+    keywordMatch: JobAlignmentNode;
+    requirementsMatch: JobAlignmentNode;
+    companyFit: JobAlignmentNode;
+  };
+
+  miscellaneous?: Record<
+    string,
+    number | { score?: number; reason?: string }
+  >;
+
+  overallImprovements: string[];
+  jobSpecificImprovements?: string[];
   isTailoredResume?: boolean;
-  jobAlignment?: unknown; // we only `JSON.stringify` it
-  overallImprovements?: ImprovementItem[];
-  miscellaneous?: Record<string, ScoreReason>;
 };
-// ------------------------------------------------------
+// -------------------------------------------------------
+
+// Small helper for label niceness
+function camelCaseToReadable(text: string): string {
+  return text.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/^./, (s) => s.toUpperCase());
+}
 
 export default function ScorerEmbedPage() {
-  const [resume, setResume] = React.useState('');
-  const [job, setJob] = React.useState('');
-  const [loading, setLoading] = React.useState(false);
-  const [error, setError] = React.useState<string | null>(null);
-  const [data, setData] = React.useState<ResumeScore | null>(null);
+  const [resume, setResume] = useState('');
+  const [job, setJob] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [data, setData] = useState<ResumeScoreResponse | null>(null);
 
-  React.useEffect(() => {
-    // resize message to parent iframe (optional)
+  // Resize the iframe height automatically for nicer embeds
+  useEffect(() => {
     const ro = new ResizeObserver(() => {
       window.parent?.postMessage(
         { source: 'cyme-scorer', type: 'resize', height: document.body.scrollHeight },
@@ -44,8 +86,12 @@ export default function ScorerEmbedPage() {
 
   const onScore = async () => {
     setError(null);
-    if (!resume.trim()) { setError('Please paste your resume.'); return; }
+    if (!resume.trim()) {
+      setError('Please paste your resume.');
+      return;
+    }
     setLoading(true);
+    setData(null);
     try {
       const body = {
         resume: { raw_text: resume.trim(), is_base_resume: !job.trim() },
@@ -57,133 +103,309 @@ export default function ScorerEmbedPage() {
         body: JSON.stringify(body),
         cache: 'no-store',
       });
-      const json: ResumeScore | { error?: string } = await res.json();
-      if (!res.ok) throw new Error((json as { error?: string })?.error || 'Failed to score');
-      setData(json as ResumeScore);
+
+      const json = (await res.json()) as ResumeScoreResponse & { error?: string };
+      if (!res.ok) {
+        throw new Error(json?.error || 'Failed to score');
+      }
+      setData(json);
     } catch (e: unknown) {
-      const message = e instanceof Error ? e.message : 'Error';
-      setError(message);
+      const msg = e instanceof Error ? e.message : 'Error';
+      setError(msg);
       setData(null);
     } finally {
       setLoading(false);
     }
   };
 
-  const ringDash = (n: number) => {
-    const clamped = Math.max(0, Math.min(100, Number(n || 0)));
-    const r = 52;
-    const C = 2 * Math.PI * r;
-    return `${(clamped / 100) * C} ${C}`;
+  // ---- UI helpers for the progress ring (Overall) ----
+  const ringColor = (n: number) =>
+    n >= 70 ? '#10b981' : n >= 50 ? '#f59e0b' : '#ef4444';
+
+  // ----- Renderers reused below -----
+  const ScoreItem = ({ label, score, reason }: { label: string; score: number; reason: string }) => {
+    const getScoreColor = (s: number) => (s >= 70 ? 'bg-green-500' : s >= 50 ? 'bg-yellow-500' : 'bg-red-500');
+    return (
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-2">
+        <div className="flex justify-between items-center">
+          <span className="text-sm font-medium">{camelCaseToReadable(label)}</span>
+          <span
+            className={cn(
+              'text-xs px-2 py-1 rounded-full font-medium',
+              score >= 70 ? 'bg-green-100 text-green-700' : score >= 50 ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'
+            )}
+          >
+            {score}/100
+          </span>
+        </div>
+        <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+          <motion.div
+            initial={{ width: 0 }}
+            animate={{ width: `${Math.max(0, Math.min(100, score))}%` }}
+            transition={{ duration: 0.8, ease: 'easeOut' }}
+            className={cn('h-full rounded-full', getScoreColor(score))}
+          />
+        </div>
+        <p className="text-xs text-muted-foreground">{reason}</p>
+      </motion.div>
+    );
+  };
+
+  const JobAlignmentItem = ({
+    label,
+    data,
+  }: {
+    label: string;
+    data: JobAlignmentNode;
+  }) => {
+    const getScoreColor = (s: number) => (s >= 70 ? 'bg-blue-500' : s >= 50 ? 'bg-yellow-500' : 'bg-red-500');
+    return (
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-3">
+        <div className="flex justify-between items-center">
+          <span className="text-sm font-medium text-blue-700">{camelCaseToReadable(label)}</span>
+          <span
+            className={cn(
+              'text-xs px-2 py-1 rounded-full font-medium',
+              data.score >= 70 ? 'bg-blue-100 text-blue-700' : data.score >= 50 ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'
+            )}
+          >
+            {data.score}/100
+          </span>
+        </div>
+        <div className="h-1.5 bg-blue-100 rounded-full overflow-hidden">
+          <motion.div
+            initial={{ width: 0 }}
+            animate={{ width: `${Math.max(0, Math.min(100, data.score))}%` }}
+            transition={{ duration: 0.8, ease: 'easeOut' }}
+            className={cn('h-full rounded-full', getScoreColor(data.score))}
+          />
+        </div>
+        <p className="text-xs text-blue-600">{data.reason}</p>
+
+        {Array.isArray(data.matchedKeywords) && data.matchedKeywords.length > 0 && (
+          <div className="space-y-1">
+            <p className="text-xs font-medium text-green-600">Matched Keywords:</p>
+            <div className="flex flex-wrap gap-1">
+              {data.matchedKeywords.slice(0, 5).map((kw, i) => (
+                <span key={i} className="text-xs px-2 py-1 bg-green-100 text-green-700 rounded-full">
+                  {kw}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {Array.isArray(data.missingKeywords) && data.missingKeywords.length > 0 && (
+          <div className="space-y-1">
+            <p className="text-xs font-medium text-red-600">Missing Keywords:</p>
+            <div className="flex flex-wrap gap-1">
+              {data.missingKeywords.slice(0, 5).map((kw, i) => (
+                <span key={i} className="text-xs px-2 py-1 bg-red-100 text-red-700 rounded-full">
+                  {kw}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {Array.isArray(data.gapAnalysis) && data.gapAnalysis.length > 0 && (
+          <div className="space-y-1">
+            <p className="text-xs font-medium text-orange-600">Areas to Address:</p>
+            <div className="space-y-1">
+              {data.gapAnalysis.slice(0, 3).map((gap, i) => (
+                <div key={i} className="flex items-start gap-2 text-xs">
+                  <div className="mt-1.5 h-1 w-1 rounded-full bg-orange-500 flex-shrink-0" />
+                  <p className="text-orange-600">{gap}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </motion.div>
+    );
   };
 
   return (
-    <div style={{
-      margin: 0, padding: 20, background: '#fafafa', color: '#0f1115',
-      fontFamily: 'Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial'
-    }}>
-      <div style={{
-        maxWidth: 900, margin: '0 auto 16px', background: '#fff', border: '1px solid #e9edf2',
-        borderRadius: 16, boxShadow: '0 4px 14px rgba(15,17,21,0.05)', padding: 16
-      }}>
-        <h3 style={{ margin: '0 0 6px' }}>Resume Scorer</h3>
-        <div style={{ color: '#64748b', fontSize: 14 }}>Paste resume (and optional job) for an instant score.</div>
+    <div
+      style={{
+        margin: 0,
+        padding: 20,
+        background: '#fafafa',
+        color: '#0f1115',
+        fontFamily: 'Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial',
+      }}
+      className="space-y-4"
+    >
+      {/* Input block (keep anonymous flow) */}
+      <Card>
+        <CardContent className="p-4">
+          <h3 className="text-base font-semibold mb-2">Resume Scorer</h3>
+          <p className="text-sm text-muted-foreground mb-3">Paste resume (and optional job) for an instant score.</p>
 
-        <div style={{ display: 'grid', gap: 12, marginTop: 12 }}>
-          <textarea rows={8} placeholder="Paste resume text here…" value={resume}
-            onChange={e => setResume(e.target.value)}
-            style={{ width: '100%', padding: '12px 14px', border: '1px solid #e5e7eb', borderRadius: 12 }} />
-          <textarea rows={5} placeholder="(Optional) paste job description here…" value={job}
-            onChange={e => setJob(e.target.value)}
-            style={{ width: '100%', padding: '12px 14px', border: '1px solid #e5e7eb', borderRadius: 12 }} />
-        </div>
+          <div className="grid gap-3">
+            <textarea
+              rows={8}
+              placeholder="Paste resume text here…"
+              value={resume}
+              onChange={(e) => setResume(e.target.value)}
+              className="w-full rounded-xl border border-slate-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-300"
+            />
+            <textarea
+              rows={5}
+              placeholder="(Optional) paste job description here…"
+              value={job}
+              onChange={(e) => setJob(e.target.value)}
+              className="w-full rounded-xl border border-slate-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-300"
+            />
+          </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 10 }}>
-          <button onClick={onScore} disabled={loading}
-            style={{ padding: '10px 14px', border: '1px solid #e5e7eb', borderRadius: 12, background: '#0f1115', color: '#fff', fontWeight: 600 }}>
-            {loading ? 'Scoring…' : 'Score Resume'}
-          </button>
-          {error && <span style={{ color: '#ef4444', fontWeight: 600 }}>{error}</span>}
-        </div>
-      </div>
+          <div className="flex items-center gap-3 mt-3">
+            <Button onClick={onScore} disabled={loading}>
+              <RefreshCw className={cn('mr-2 h-4 w-4', loading && 'animate-spin')} />
+              {loading ? 'Scoring…' : 'Score Resume'}
+            </Button>
+            {error && <span className="text-red-600 font-medium text-sm">{error}</span>}
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Results */}
-      {data ? (
-        <div style={{ maxWidth: 900, margin: '0 auto', display: 'grid', gap: 12, gridTemplateColumns: '1fr 1fr' }}>
-          {/* Overall */}
-          <div style={{ background: '#fff', border: '1px solid #e9edf2', borderRadius: 16, padding: 16 }}>
-            <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-              <div style={{ position: 'relative', width: 120, height: 120 }}>
-                <svg viewBox="0 0 120 120" style={{ width: '100%', height: '100%', transform: 'rotate(-90deg)' }}>
-                  <circle cx="60" cy="60" r="52" fill="none" stroke="#eef2f7" strokeWidth="12" />
-                  <circle cx="60" cy="60" r="52" fill="none" stroke="#0ea5e9" strokeWidth="12" strokeLinecap="round"
-                          strokeDasharray={ringDash(data.overallScore?.score ?? 0)} />
-                </svg>
-                <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 24 }}>
-                  {Math.max(0, Math.min(100, Number(data.overallScore?.score || 0)))}
+      {data && (
+        <div className="grid gap-4">
+          {/* Header + Overall */}
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center gap-4">
+                <div className="w-20 h-20">
+                  <CircularProgressbar
+                    value={Math.max(0, Math.min(100, data.overallScore?.score ?? 0))}
+                    text={`${Math.max(0, Math.min(100, data.overallScore?.score ?? 0))}%`}
+                    styles={buildStyles({
+                      pathColor: ringColor(data.overallScore?.score ?? 0),
+                      textColor: '#374151',
+                      trailColor: '#e5e7eb',
+                      pathTransitionDuration: 1,
+                      textSize: '24px',
+                    })}
+                  />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h4 className="font-medium mb-1">Overall Score</h4>
+                  <p className="text-sm text-muted-foreground">{data.overallScore?.reason}</p>
                 </div>
               </div>
-              <div>
-                <div style={{ color: '#64748b', fontSize: 13 }}>Overall Score</div>
-                <div style={{ marginTop: 6, fontSize: 14, lineHeight: 1.4 }}>{data.overallScore?.reason || ''}</div>
-              </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
-          {/* Quick Summary */}
-          <div style={{ background: '#fff', border: '1px solid #e9edf2', borderRadius: 16, padding: 16 }}>
-            <h4 style={{ margin: '0 0 8px', fontSize: 15 }}>Quick Summary</h4>
-            <div><span style={{ color: '#64748b' }}>Completeness:</span> {data.completeness?.score ?? '—'} {data.completeness?.reason ? `— ${data.completeness?.reason}` : ''}</div>
-            <div style={{ marginTop: 4 }}><span style={{ color: '#64748b' }}>Impact:</span> {data.impactScore?.score ?? '—'} {data.impactScore?.reason ? `— ${data.impactScore?.reason}` : ''}</div>
-            <div style={{ marginTop: 4 }}><span style={{ color: '#64748b' }}>Tailored:</span> {data.isTailoredResume ? 'Yes' : 'No'}</div>
-          </div>
-
-          {/* Completeness */}
-          <div style={{ background: '#fff', border: '1px solid #e9edf2', borderRadius: 16, padding: 16 }}>
-            <h4 style={{ margin: '0 0 8px', fontSize: 15 }}>Completeness</h4>
-            <pre style={{ whiteSpace: 'pre-wrap', margin: 0, color: '#64748b' }}>
-              {JSON.stringify(data.completeness ?? null, null, 2)}
-            </pre>
-          </div>
-
-          {/* Impact */}
-          <div style={{ background: '#fff', border: '1px solid #e9edf2', borderRadius: 16, padding: 16 }}>
-            <h4 style={{ margin: '0 0 8px', fontSize: 15 }}>Impact</h4>
-            <pre style={{ whiteSpace: 'pre-wrap', margin: 0, color: '#64748b' }}>
-              {JSON.stringify(data.impactScore ?? null, null, 2)}
-            </pre>
-          </div>
-
-          {/* Job Alignment */}
-          {Boolean(data.jobAlignment) && (
-            <div style={{ gridColumn: '1 / -1', background: '#fff', border: '1px solid #e9edf2', borderRadius: 16, padding: 16 }}>
-              <h4 style={{ margin: '0 0 8px', fontSize: 15 }}>Job Alignment</h4>
-              <pre style={{ whiteSpace: 'pre-wrap', margin: 0, color: '#64748b' }}>
-                {JSON.stringify(data.jobAlignment, null, 2)}
-              </pre>
-            </div>
+          {/* Key Improvements */}
+          {Array.isArray(data.overallImprovements) && data.overallImprovements.length > 0 && (
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Target className="h-4 w-4" />
+                  Key Improvements
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <div className="space-y-2">
+                  {data.overallImprovements.slice(0, 5).map((improvement, index) => (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.05 }}
+                      className="flex items-start gap-2 text-sm"
+                    >
+                      <div className="mt-1.5 h-1.5 w-1.5 rounded-full bg-primary flex-shrink-0" />
+                      <p className="text-muted-foreground">{improvement}</p>
+                    </motion.div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
           )}
 
-          {/* Improvements */}
-          <div style={{ gridColumn: '1 / -1', background: '#fff', border: '1px solid #e9edf2', borderRadius: 16, padding: 16 }}>
-            <h4 style={{ margin: '0 0 8px', fontSize: 15 }}>Overall Improvements</h4>
-            <ul style={{ margin: '8px 0 0 18px' }}>
-              {(data?.overallImprovements ?? []).map((it: ImprovementItem, i: number) => (
-                <li key={i} style={{ margin: '4px 0' }}>
-                  {typeof it === 'string' ? it : (it?.text ?? JSON.stringify(it))}
-                </li>
-              ))}
-            </ul>
-          </div>
+          {/* Job-specific Improvements (tailored only) */}
+          {data.isTailoredResume &&
+            Array.isArray(data.jobSpecificImprovements) &&
+            data.jobSpecificImprovements.length > 0 && (
+              <Card className="border-blue-200 bg-blue-50/50">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base flex items-center gap-2 text-blue-700">
+                    <Award className="h-4 w-4" />
+                    Job-Specific Improvements
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  <div className="space-y-2">
+                    {data.jobSpecificImprovements.slice(0, 5).map((improvement, index) => (
+                      <motion.div
+                        key={index}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.05 }}
+                        className="flex items-start gap-2 text-sm"
+                      >
+                        <div className="mt-1.5 h-1.5 w-1.5 rounded-full bg-blue-500 flex-shrink-0" />
+                        <p className="text-blue-700">{improvement}</p>
+                      </motion.div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
-          {/* Misc */}
-          <div style={{ gridColumn: '1 / -1', background: '#fff', border: '1px solid #e9edf2', borderRadius: 16, padding: 16 }}>
-            <h4 style={{ margin: '0 0 8px', fontSize: 15 }}>Miscellaneous Metrics</h4>
-            <pre style={{ whiteSpace: 'pre-wrap', margin: 0, color: '#64748b' }}>
-              {JSON.stringify(data.miscellaneous ?? null, null, 2)}
-            </pre>
-          </div>
+          {/* Job Alignment (tailored only) */}
+          {data.isTailoredResume && data.jobAlignment && (
+            <Card className="border-blue-200 bg-blue-50/50">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base flex items-center gap-2 text-blue-700">
+                  <Target className="h-4 w-4" />
+                  Job Alignment Analysis
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <div className="space-y-4">
+                  {Object.entries(data.jobAlignment).map(([label, node]) => (
+                    <JobAlignmentItem key={label} label={label} data={node as JobAlignmentNode} />
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Detailed Metrics */}
+          {(() => {
+            const sections: Array<{
+              title: string;
+              icon: React.ComponentType<{ className?: string }>;
+              metrics: Record<string, ScoreNode>;
+            }> = [
+              { title: 'Completeness', icon: Award as any, metrics: data.completeness },
+              { title: 'Impact Score', icon: TrendingUp as any, metrics: data.impactScore },
+              { title: 'Role Match', icon: Target as any, metrics: data.roleMatch },
+            ];
+
+            return sections.map(({ title, icon: Icon, metrics }) => (
+              <Card key={title}>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <Icon className="h-4 w-4" />
+                    {title}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  <div className="space-y-4">
+                    {Object.entries(metrics).map(([label, node]) => (
+                      <ScoreItem key={label} label={label} score={(node as ScoreNode).score} reason={(node as ScoreNode).reason} />
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            ));
+          })()}
         </div>
-      ) : null}
+      )}
     </div>
   );
 }
