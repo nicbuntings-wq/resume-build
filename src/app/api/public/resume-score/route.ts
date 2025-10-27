@@ -15,10 +15,12 @@ export async function POST(req: NextRequest) {
     const json = await req.json();
     const { resume, job } = Body.parse(json);
 
-    // Keep the type explicit (no `any`)
-    const aiClient = initializeAIClient({
-      model: process.env.CYME_PUBLIC_SCORER_MODEL || undefined,
-    } as AIConfig);
+    // ✅ Use env if present, otherwise hard-default to gpt-4o-mini
+    const modelId =
+      process.env.CYME_PUBLIC_SCORER_MODEL ?? "gpt-4o-mini";
+
+    // OPENAI_API_KEY must be set in Vercel; initializeAIClient will use it
+    const aiClient = initializeAIClient({ model: modelId } as AIConfig);
 
     let prompt = `
       You are scoring a resume. Return JSON that matches resumeScoreSchema exactly.
@@ -42,16 +44,20 @@ export async function POST(req: NextRequest) {
       prompt += `\nThis is a base resume. Set isTailoredResume=false and omit jobAlignment.\n`;
     }
 
-    // Structured output (no `any`)
     const { object } = await (await import("ai")).generateObject({
       model: aiClient,
       schema: resumeScoreSchema,
       prompt,
     });
 
-    return NextResponse.json(object, { headers: { "Cache-Control": "no-store" } });
+    return NextResponse.json(object, {
+      headers: { "Cache-Control": "no-store" },
+    });
   } catch (e: unknown) {
     const message = e instanceof Error ? e.message : "Bad Request";
-    return NextResponse.json({ error: message }, { status: 400 });
+    return NextResponse.json(
+      { error: message, hint: "Ensure OPENAI_API_KEY is set; model defaults to gpt-4o-mini" },
+      { status: 400 }
+    );
   }
 }
