@@ -1,10 +1,12 @@
 'use client';
 
-import * as React from 'react';
+import type React from 'react';
 import { useEffect, useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
+
+import pdfToText from "react-pdftotext";
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -69,14 +71,14 @@ function camelCaseToReadable(text: string): string {
 }
 
 export default function ScorerEmbedPage() {
-  const [resume, setResume] = useState('');
-  const [job, setJob] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [data, setData] = useState<ResumeScoreResponse | null>(null);
+const [resume, setResume] = useState('');     // will hold parsed PDF text OR pasted text
+const [job, setJob] = useState('');
+const [loading, setLoading] = useState(false);
+const [error, setError] = useState<string | null>(null);
+const [data, setData] = useState<ResumeScoreResponse | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [dragActive, setDragActive] = useState(false);
-  const [pdfLoading, setPdfLoading] = useState(false);
+  const [pdfLoading] = useState(false);
 
   // Resize the iframe height automatically for nicer embeds
   useEffect(() => {
@@ -90,55 +92,46 @@ export default function ScorerEmbedPage() {
     return () => ro.disconnect();
   }, []);
 
-      // Minimal local types so we don't use `any`
-  type PDFTextItem = { str?: string };
-  type PDFTextContent = { items: PDFTextItem[] };
-  type PDFPageProxy = { getTextContent: () => Promise<PDFTextContent> };
-  type PDFDocumentProxy = { numPages: number; getPage: (n: number) => Promise<PDFPageProxy> };
-  type PDFJSLite = {
-    GlobalWorkerOptions: { workerSrc: unknown };
-    getDocument: (opts: { data: ArrayBuffer }) => { promise: Promise<PDFDocumentProxy> };
-  };
+const handleDrop = async (e: DragEvt) => {
+  e.preventDefault();
+  e.stopPropagation();
+  setDragActive(false);
 
-  // Extract text from a PDF client-side using pdfjs-dist (dynamic import to avoid SSR issues)
-  const extractTextFromPdf = async (file: File): Promise<string> => {
-    setPdfLoading(true);
-    try {
-      // ESM build for Next 15; dynamic import keeps worker bundling sane
-      const pdfjsLib = (await import('pdfjs-dist/build/pdf.mjs')) as unknown as PDFJSLite;
-      // The worker module exports a value the library accepts as workerSrc. Typing is opaque,
-      // so we intentionally expect a TS error here.
-      // @ts-expect-error: pdfjs worker module provides a URL/object acceptable to workerSrc
-      pdfjsLib.GlobalWorkerOptions.workerSrc = await import('pdfjs-dist/build/pdf.worker.mjs');
+  const files = Array.from(e.dataTransfer.files);
+  const pdfFile = files.find(f => f.type === "application/pdf");
+  if (!pdfFile) {
+    setError("Please drop a PDF file.");
+    return;
+  }
+  try {
+    const text = await pdfToText(pdfFile);
+    setResume(prev => prev + (prev ? "\n\n" : "") + text);
+  } catch (err) {
+    console.error("PDF processing error:", err);
+    setError("Failed to extract text from the PDF. Try again or paste the text.");
+  }
+};
 
-      const buf = await file.arrayBuffer();
-      const pdf = (await pdfjsLib.getDocument({ data: buf }).promise) as PDFDocumentProxy;
-
-      let fullText = '';
-      for (let i = 1; i <= pdf.numPages; i++) {
-        const page = await pdf.getPage(i);
-        const content = await page.getTextContent();
-        const strings = content.items
-          .map((it) => (typeof it?.str === 'string' ? it.str : ''))
-          .filter((s): s is string => Boolean(s));
-        fullText += strings.join(' ') + '\n';
-      }
-      return fullText.trim();
-    } finally {
-      setPdfLoading(false);
-    }
-  };
-
-  const handlePdfFile = async (file: File) => {
-    if (!file || file.type !== 'application/pdf') return;
-    const text = await extractTextFromPdf(file);
-    if (text) setResume(text);
-  };
+const handleFileInput = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+  if (file.type !== "application/pdf") {
+    setError("Please choose a PDF file.");
+    return;
+  }
+  try {
+    const text = await pdfToText(file);
+    setResume(prev => prev + (prev ? "\n\n" : "") + text);
+  } catch (err) {
+    console.error("PDF processing error:", err);
+    setError("Failed to extract text from the PDF. Try again or paste the text.");
+  }
+};
   
   const onScore = async () => {
     setError(null);
     if (!resume.trim()) {
-      setError('Please paste your resume.');
+      setError('Please upload or paste your resume.');
       return;
     }
     setLoading(true);
@@ -302,32 +295,32 @@ export default function ScorerEmbedPage() {
     type="file"
     accept="application/pdf"
     className="hidden"
-    onChange={async (e) => {
-      const f = e.target.files?.[0];
-      if (f) await handlePdfFile(f);
-      e.currentTarget.value = '';
-    }}
+   onChange={async (e) => {
+  await handleFileInput(e);
+  // allow re-uploading the same file
+  e.currentTarget.value = '';
+}}
   />
 
   {/* Drop zone */}
   <div
-    onClick={() => fileInputRef.current?.click()}
-    onDragOver={(e: DragEvt) => {
-      e.preventDefault();
-      setDragActive(true);
-    }}
-    onDragLeave={() => setDragActive(false)}
-    onDrop={async (e: DragEvt) => {
-      e.preventDefault();
-      setDragActive(false);
-      const f = e.dataTransfer.files?.[0];
-      if (f) await handlePdfFile(f);
-    }}
-    className={cn(
-      'rounded-xl border-2 border-dashed cursor-pointer transition-colors',
-      dragActive ? 'border-violet-500 bg-violet-50/70' : 'border-violet-300 bg-violet-50/40 hover:bg-violet-50'
-    )}
-  >
+  role="button"
+  tabIndex={0}
+  onKeyDown={(e) => {
+    if (e.key === 'Enter' || e.key === ' ') fileInputRef.current?.click();
+  }}
+  onClick={() => fileInputRef.current?.click()}
+  onDragOver={(e: DragEvt) => {
+    e.preventDefault();
+    setDragActive(true);
+  }}
+  onDragLeave={() => setDragActive(false)}
+  onDrop={handleDrop}
+  className={cn(
+    'rounded-xl border-2 border-dashed cursor-pointer transition-colors',
+    dragActive ? 'border-violet-500 bg-violet-50/70' : 'border-violet-300 bg-violet-50/40 hover:bg-violet-50'
+  )}
+>
     <div className="flex flex-col items-center justify-center gap-2 px-6 py-10 text-center">
       {pdfLoading ? (
         <Loader2 className="h-6 w-6 animate-spin text-violet-600" />
