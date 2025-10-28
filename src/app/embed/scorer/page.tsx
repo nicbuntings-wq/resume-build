@@ -81,16 +81,19 @@ const [data, setData] = useState<ResumeScoreResponse | null>(null);
   const [pdfLoading, setPdfLoading] = useState(false);
 
   // Resize the iframe height automatically for nicer embeds
-  useEffect(() => {
-    const ro = new ResizeObserver(() => {
-      window.parent?.postMessage(
-        { source: 'cyme-scorer', type: 'resize', height: document.body.scrollHeight },
-        '*'
-      );
-    });
-    ro.observe(document.body);
-    return () => ro.disconnect();
-  }, []);
+useEffect(() => {
+  // Force the embed background transparent
+  document.body.style.background = 'transparent';
+
+  const ro = new ResizeObserver(() => {
+    window.parent?.postMessage(
+      { source: 'cyme-scorer', type: 'resize', height: document.body.scrollHeight },
+      '*'
+    );
+  });
+  ro.observe(document.body);
+  return () => ro.disconnect();
+}, []);
 
 const handleDrop = async (e: DragEvt) => {
   e.preventDefault();
@@ -282,7 +285,7 @@ const handleFileInput = async (e: React.ChangeEvent<HTMLInputElement>) => {
       style={{
         margin: 0,
         padding: 20,
-        background: '#fafafa',
+        background: 'transparent',
         color: '#0f1115',
         fontFamily: 'Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial',
       }}
