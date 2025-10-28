@@ -294,9 +294,9 @@ const handleFileInput = async (e: React.ChangeEvent<HTMLInputElement>) => {
       {/* Input block (keep anonymous flow) */}
       <Card>
         <CardContent className="p-4">
-         <h3 className="text-lg font-semibold mb-1">Import Resume Content To Get Your Score</h3>
+         <h3 className="text-lg font-semibold mb-1">Import Your Resume To Get It Scored</h3>
 <p className="text-sm text-muted-foreground mb-4">
-  Upload your PDF resume. Optionally add a job description for a tailored score.
+  Upload your resume. You can also paste in a job description for a tailored score.
 </p>
 
          <div className="grid gap-3">
@@ -354,16 +354,15 @@ const handleFileInput = async (e: React.ChangeEvent<HTMLInputElement>) => {
     <span className="font-medium text-violet-700">Drop your PDF resume here</span>
   )}
 </div>
-<div className="text-xs text-muted-foreground">.pdf only • We’ll extract the text automatically</div>
     </div>
   </div>
 
   {/* Optional Job Description */}
   <div className="space-y-1">
-    <label className="text-xs font-medium text-slate-500">(Optional) paste job description</label>
+    <label className="text-xs font-medium text-slate-500">(Optional) paste the job description for a job you are applying for</label>
     <textarea
       rows={5}
-      placeholder="Paste the job description if you want a tailored alignment score…"
+      placeholder="Paste the job description here if you want a tailored alignment score…"
       value={job}
       onChange={(e) => setJob(e.target.value)}
       className="w-full rounded-xl border border-slate-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-300"
