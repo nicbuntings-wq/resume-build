@@ -78,7 +78,7 @@ const [error, setError] = useState<string | null>(null);
 const [data, setData] = useState<ResumeScoreResponse | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [dragActive, setDragActive] = useState(false);
-  const [pdfLoading] = useState(false);
+  const [pdfLoading, setPdfLoading] = useState(false);
 
   // Resize the iframe height automatically for nicer embeds
   useEffect(() => {
@@ -103,13 +103,17 @@ const handleDrop = async (e: DragEvt) => {
     setError("Please drop a PDF file.");
     return;
   }
-  try {
-    const text = await pdfToText(pdfFile);
-    setResume(prev => prev + (prev ? "\n\n" : "") + text);
-  } catch (err) {
-    console.error("PDF processing error:", err);
-    setError("Failed to extract text from the PDF. Try again or paste the text.");
-  }
+try {
+  setError(null);
+  setPdfLoading(true);
+  const text = await pdfToText(pdfFile);
+  setResume(text);
+} catch (err) {
+  console.error("PDF processing error:", err);
+  setError("Failed to extract text from the PDF. Try again.");
+} finally {
+  setPdfLoading(false);
+}
 };
 
 const handleFileInput = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -119,21 +123,25 @@ const handleFileInput = async (e: React.ChangeEvent<HTMLInputElement>) => {
     setError("Please choose a PDF file.");
     return;
   }
-  try {
-    const text = await pdfToText(file);
-    setResume(prev => prev + (prev ? "\n\n" : "") + text);
-  } catch (err) {
-    console.error("PDF processing error:", err);
-    setError("Failed to extract text from the PDF. Try again or paste the text.");
-  }
+ try {
+  setError(null);
+  setPdfLoading(true);
+  const text = await pdfToText(file);
+  setResume(text);
+} catch (err) {
+  console.error("PDF processing error:", err);
+  setError("Failed to extract text from the PDF. Try again.");
+} finally {
+  setPdfLoading(false);
+}
 };
   
   const onScore = async () => {
     setError(null);
     if (!resume.trim()) {
-      setError('Please upload or paste your resume.');
-      return;
-    }
+  setError('Please upload your resume.');
+  return;
+}
     setLoading(true);
     setData(null);
     try {
@@ -285,7 +293,7 @@ const handleFileInput = async (e: React.ChangeEvent<HTMLInputElement>) => {
         <CardContent className="p-4">
          <h3 className="text-lg font-semibold mb-1">Import Resume Content To Get Your Score</h3>
 <p className="text-sm text-muted-foreground mb-4">
-  Upload your PDF resume <span className="font-medium">or</span> paste the text below. Optionally add a job description for a tailored score.
+  Upload your PDF resume. Optionally add a job description for a tailored score.
 </p>
 
          <div className="grid gap-3">
@@ -327,24 +335,24 @@ const handleFileInput = async (e: React.ChangeEvent<HTMLInputElement>) => {
       ) : (
         <UploadCloud className="h-6 w-6 text-violet-600" />
       )}
-      <div className="text-sm">
-        <span className="font-medium text-violet-700">Drop your PDF resume here</span>{' '}
-        <span className="text-muted-foreground">or click to browse files</span>
-      </div>
-      <div className="text-xs text-muted-foreground">.pdf only • We’ll extract the text automatically</div>
+      {/* Status text (aria-live for SR announcement) */}
+<div className="text-sm" aria-live="polite">
+  {pdfLoading ? (
+    <span className="font-medium text-violet-700">Extracting text…</span>
+  ) : resume.trim().length > 0 ? (
+    <span className="font-semibold text-green-700 flex items-center gap-2">
+      {/* simple tick using an inline SVG to avoid extra deps */}
+      <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" className="inline-block">
+        <path d="M20 6L9 17l-5-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      </svg>
+      PDF uploaded
+    </span>
+  ) : (
+    <span className="font-medium text-violet-700">Drop your PDF resume here</span>
+  )}
+</div>
+<div className="text-xs text-muted-foreground">.pdf only • We’ll extract the text automatically</div>
     </div>
-  </div>
-
-  {/* Paste-text fallback */}
-  <div className="space-y-1">
-    <label className="text-xs font-medium text-slate-500">Or paste your resume text here</label>
-    <textarea
-      rows={8}
-      placeholder="Start pasting your resume content here…"
-      value={resume}
-      onChange={(e) => setResume(e.target.value)}
-      className="w-full rounded-xl border border-slate-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-300"
-    />
   </div>
 
   {/* Optional Job Description */}
@@ -360,7 +368,7 @@ const handleFileInput = async (e: React.ChangeEvent<HTMLInputElement>) => {
   </div>
 </div>
           <div className="flex items-center gap-3 mt-3">
-            <Button onClick={onScore} disabled={loading || (!resume.trim() && !job.trim())}>
+            <Button onClick={onScore} disabled={loading || !resume.trim()}>
               <RefreshCw className={cn('mr-2 h-4 w-4', loading && 'animate-spin')} />
               {loading ? 'Scoring…' : 'Score Resume'}
             </Button>
