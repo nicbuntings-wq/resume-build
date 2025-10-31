@@ -9,22 +9,23 @@ export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const code = searchParams.get('code');
 
-  // ⛔ If no code provided, go home instead of showing an error
   if (!code) {
     console.warn('Missing code in confirmation link');
-    return NextResponse.redirect(new URL('/', req.url)); // 👈 Redirect to homepage
+    return NextResponse.redirect(new URL('/', req.url)); // fallback if no code
   }
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.exchangeCodeForSession(code);
+  const { data, error } = await supabase.auth.exchangeCodeForSession(code);
 
-  // ⛔ If Supabase throws an error, still go home instead of /auth/login
   if (error) {
     console.error('exchangeCodeForSession error:', error.message);
-    return NextResponse.redirect(new URL('/', req.url)); // 👈 Redirect to homepage
+    // Redirect to homepage if Supabase returns an error (e.g. expired link)
+    return NextResponse.redirect(new URL('/', req.url));
   }
 
-  // ✅ Success: user is signed in, cookies set
-  console.log('✅ Email confirmed successfully');
-  return NextResponse.redirect(new URL('/home', req.url)); // 👈 Redirect to dashboard/home
+  // ✅ Success: user is now signed in and cookies are set
+  console.log('✅ Email confirmed successfully for user:', data.user?.email);
+
+  // 👇 Redirect to your main user dashboard
+  return NextResponse.redirect(new URL('/home', req.url));
 }
