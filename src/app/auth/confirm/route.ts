@@ -1,30 +1,30 @@
-import { type EmailOtpType } from '@supabase/supabase-js'
-import { type NextRequest } from 'next/server'
-import { redirect } from 'next/navigation'
+// app/auth/confirm/route.ts
+export const runtime = 'nodejs';         // must be Node to set cookies
+export const dynamic = 'force-dynamic';  // always run fresh
 
-import { createClient } from '@/utils/supabase/server'
+import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
+import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
 
-export async function GET(request: NextRequest) {
-  const url = new URL(request.url)
+export async function GET(req: Request) {
+  const { searchParams } = new URL(req.url);
+  const code = searchParams.get("code");
 
-  // Supabase may send token as `token_hash` (new) or `code` (older).
-  const token_hash = url.searchParams.get('token_hash') ?? url.searchParams.get('code')
-
-  // For email confirmation this is usually "signup". Keep what's sent, but default to signup.
-  const type = (url.searchParams.get('type') as EmailOtpType | null) ?? 'signup'
-
-  // Only allow internal redirects like "/home". Anything else falls back to "/".
-  const nextParam = url.searchParams.get('next')
-  const next = nextParam && nextParam.startsWith('/') ? nextParam : '/'
-
-  if (token_hash && type) {
-    const supabase = await createClient()
-    const { error } = await supabase.auth.verifyOtp({ type, token_hash })
-    if (!error) {
-      return redirect(next)
-    }
+  // No code means Supabase didn't append it or link reused/expired
+  if (!code) {
+    return NextResponse.redirect(new URL("/auth/login?error=missing_code", req.url));
   }
 
-  // On failure, send the user to your login page with an error flag
-  return redirect('/auth/login?error=email_confirmation')
+  const supabase = createRouteHandlerClient({ cookies });
+  const { error } = await supabase.auth.exchangeCodeForSession(code);
+
+  if (error) {
+    console.error("Exchange error:", error);
+    return NextResponse.redirect(
+      new URL(`/auth/login?error=${encodeURIComponent(error.message)}`, req.url)
+    );
+  }
+
+  // 🎉 Success — session cookies are now set on cyme.ai
+  return NextResponse.redirect(new URL("/home", req.url));
 }
