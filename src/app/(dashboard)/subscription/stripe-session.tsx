@@ -28,30 +28,40 @@ export const postStripeSession = async ({ priceId, referral }: NewSessionOptions
             email: user.email
         });
 
-        const returnUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/subscription/checkout-return?session_id={CHECKOUT_SESSION_ID}`;
+      // --- build & create session (REVISED) ---
+const baseUrl = process.env.NEXT_PUBLIC_SITE_URL!;
+if (!baseUrl?.startsWith("http")) {
+  throw new Error("NEXT_PUBLIC_SITE_URL must be a full URL (e.g. https://cyme.ai)");
+}
 
-        const session = await stripe.checkout.sessions.create({
-            customer: customerId,
-            ui_mode: "embedded",
-            line_items: [
-                {
-                    price: priceId,
-                    quantity: 1,
-                },
-            ],
-            mode: "subscription",
-            allow_promotion_codes: true,
-            return_url: returnUrl,
+const returnUrl = `${baseUrl}/subscription/checkout-return?session_id={CHECKOUT_SESSION_ID}`;
 
-            // 👇 NEW: Rewardful integration
-            client_reference_id: referral ?? undefined,
-            metadata: referral ? { referral } : undefined,
-        });
+// Only keep referral if it’s a non-empty string
+const normalizedReferral =
+  referral && referral.trim().length > 0 ? referral.trim() : undefined;
 
-        if (!session.client_secret) {
-            throw new Error('Failed to create Stripe session');
-        }
+// Start with params that are always sent
+const params: Stripe.Checkout.SessionCreateParams = {
+  customer: customerId,
+  ui_mode: "embedded",
+  line_items: [{ price: priceId, quantity: 1 }],
+  mode: "subscription",
+  allow_promotion_codes: true,
+  return_url: returnUrl,
+  // Always tag your internal user id for reconciliation
+  metadata: { userId: user.id, ...(normalizedReferral ? { referral: normalizedReferral } : {}) },
+};
 
+// Only attach client_reference_id when a real referral exists
+if (normalizedReferral) {
+  params.client_reference_id = normalizedReferral;
+}
+
+const session = await stripe.checkout.sessions.create(params);
+
+if (!session.client_secret) {
+  throw new Error('Failed to create Stripe session');
+}
         return {
             clientSecret: session.client_secret
         };
