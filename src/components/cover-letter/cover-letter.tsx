@@ -20,7 +20,7 @@ export default function CoverLetter({ containerWidth }: CoverLetterProps) {
       type: 'UPDATE_FIELD',
       field: 'cover_letter',
       value: {
-        content: data.content,
+        content: String(data.content || ''),
         lastUpdated: new Date().toISOString()
       }
     });

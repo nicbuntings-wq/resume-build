@@ -84,7 +84,7 @@ export interface Resume {
     [key: string]: { visible: boolean };
   };
   has_cover_letter: boolean;
-  cover_letter?: Record<string, unknown> | null;
+  cover_letter?: { content: string; lastUpdated?: string } | null;
 }
 
 export interface DocumentSettings {
