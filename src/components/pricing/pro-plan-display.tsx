@@ -23,7 +23,7 @@ const plans: Plan[] = [
   {
     title: 'Pro',
     priceId: process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID!,
-    price: '$30',
+    price: '$0',
     features: [
       'Unlimited Base Resumes',
       'Unlimited Tailored Resumes',
