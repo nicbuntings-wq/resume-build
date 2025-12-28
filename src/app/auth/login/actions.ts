@@ -34,7 +34,7 @@ export async function login(formData: FormData): Promise<AuthResult> {
 
 // Signup
 export async function signup(formData: FormData): Promise<AuthResult> {
-  const supabase = await createServiceClient();
+  const supabase = await createClient(); // Changed to createClient for session handling
 
   const data = {
     email: formData.get('email') as string,
@@ -43,7 +43,7 @@ export async function signup(formData: FormData): Promise<AuthResult> {
       data: {
         full_name: formData.get('name') as string,
       },
-      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/confirm`
+      // Removed emailRedirectTo to skip verification redirect
     }
   }
   const { error: signupError } = await supabase.auth.signUp(data);
@@ -59,6 +59,7 @@ export async function signup(formData: FormData): Promise<AuthResult> {
     return { success: false, error: signupError.message }
   }
 
+  redirect('/home') // Redirect straight to dashboard after signup
   return { success: true }
 } 
 
@@ -276,4 +277,4 @@ export async function deleteUserAccount(formData: FormData) {
   }
 
   redirect('//')
-} 
+}
