@@ -7,7 +7,7 @@ import { signup } from "@/app/auth/login/actions";
 import { useState } from "react";
 import { useFormStatus } from "react-dom";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { CheckCircle2, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useAuth } from "./auth-context";
 
 function SubmitButton() {
@@ -33,7 +33,6 @@ function SubmitButton() {
 
 interface FormState {
   error?: string;
-  success?: boolean;
 }
 
 export function SignupForm() {
@@ -79,12 +78,12 @@ export function SignupForm() {
       formDataToSend.append('name', formData.name || '');
       
       const result = await signup(formDataToSend);
-      if (!result.success) {
+      
+      // If there is an error, show it. If successful, the server 
+      // action will handle the redirect to /home automatically.
+      if (result && !result.success) {
         setFormState({ error: result.error || "Failed to create account" });
-        return;
       }
-
-      setFormState({ success: true });
     } catch (error: unknown) {
       console.error("Signup error:", error);
       setFormState({ error: "An unexpected error occurred" });
@@ -104,93 +103,76 @@ export function SignupForm() {
   };
 
   return (
-    <>
-      {formState.success ? (
-        <Alert className="bg-emerald-50/50 text-emerald-900 border-emerald-200/50">
-          <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-          <AlertDescription>
-            Account created successfully! Please check your email to confirm your account.
-          </AlertDescription>
+    <form onSubmit={handleSubmit} className="space-y-4">
+      {formState.error && (
+        <Alert variant="destructive" className="bg-red-50/50 text-red-900 border-red-200/50">
+          <AlertDescription>{formState.error}</AlertDescription>
         </Alert>
-      ) : (
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {formState.error && (
-            <Alert variant="destructive" className="bg-red-50/50 text-red-900 border-red-200/50">
-              <AlertDescription>{formState.error}</AlertDescription>
-            </Alert>
-          )}
-
-          <div className="space-y-2">
-            <Label htmlFor="name" className="text-sm font-medium">Full Name</Label>
-            <div className="relative">
-              {/* <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50" /> */}
-              <Input
-                id="name"
-                name="name"
-                type="text"
-                value={formData.name}
-                onChange={(e) => handleInputChange('name', e.target.value)}
-                onBlur={() => setFieldTouched('name')}
-                placeholder="John Doe"
-                required
-                minLength={2}
-                maxLength={50}
-                // className="pl-10"
-                validation={validations.name}
-                isTouched={touchedFields.name}
-                autoFocus
-              />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="email" className="text-sm font-medium">Email</Label>
-            <div className="relative">
-              {/* <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50" /> */}
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="username"
-                value={formData.email}
-                onChange={(e) => handleInputChange('email', e.target.value)}
-                onBlur={() => setFieldTouched('email')}
-                placeholder="you@example.com"
-                required
-                pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
-                // className="pl-10"
-                validation={validations.email}
-                isTouched={touchedFields.email}
-              />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="password" className="text-sm font-medium">Password</Label>
-            <div className="relative">
-              {/* <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50" /> */}
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="new-password"
-                value={formData.password}
-                onChange={(e) => handleInputChange('password', e.target.value)}
-                onBlur={() => setFieldTouched('password')}
-                placeholder="••••••••"
-                required
-                minLength={6}
-                maxLength={100}
-                // className="pl-10"
-                validation={validations.password}
-                isTouched={touchedFields.password}
-              />
-            </div>
-          </div>
-
-          <SubmitButton />
-        </form>
       )}
-    </>
+
+      <div className="space-y-2">
+        <Label htmlFor="name" className="text-sm font-medium">Full Name</Label>
+        <div className="relative">
+          <Input
+            id="name"
+            name="name"
+            type="text"
+            value={formData.name}
+            onChange={(e) => handleInputChange('name', e.target.value)}
+            onBlur={() => setFieldTouched('name')}
+            placeholder="John Doe"
+            required
+            minLength={2}
+            maxLength={50}
+            validation={validations.name}
+            isTouched={touchedFields.name}
+            autoFocus
+          />
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="email" className="text-sm font-medium">Email</Label>
+        <div className="relative">
+          <Input
+            id="email"
+            name="email"
+            type="email"
+            autoComplete="username"
+            value={formData.email}
+            onChange={(e) => handleInputChange('email', e.target.value)}
+            onBlur={() => setFieldTouched('email')}
+            placeholder="you@example.com"
+            required
+            pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+            validation={validations.email}
+            isTouched={touchedFields.email}
+          />
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="password" className="text-sm font-medium">Password</Label>
+        <div className="relative">
+          <Input
+            id="password"
+            name="password"
+            type="password"
+            autoComplete="new-password"
+            value={formData.password}
+            onChange={(e) => handleInputChange('password', e.target.value)}
+            onBlur={() => setFieldTouched('password')}
+            placeholder="••••••••"
+            required
+            minLength={6}
+            maxLength={100}
+            validation={validations.password}
+            isTouched={touchedFields.password}
+          />
+        </div>
+      </div>
+
+      <SubmitButton />
+    </form>
   );
-} 
+}
