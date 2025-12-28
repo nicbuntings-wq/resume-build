@@ -1,6 +1,6 @@
 'use server'
 
-import { createClient, createServiceClient } from "@/utils/supabase/server";
+import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import { getAuthenticatedClient, getServiceClient } from "@/utils/actions/utils/supabase";
 
@@ -34,7 +34,7 @@ export async function login(formData: FormData): Promise<AuthResult> {
 
 // Signup
 export async function signup(formData: FormData): Promise<AuthResult> {
-  const supabase = await createClient(); // Changed to createClient for session handling
+  const supabase = await createClient(); // Handles session cookies for instant login
 
   const data = {
     email: formData.get('email') as string,
@@ -42,14 +42,12 @@ export async function signup(formData: FormData): Promise<AuthResult> {
     options: {
       data: {
         full_name: formData.get('name') as string,
-      },
-      // Removed emailRedirectTo to skip verification redirect
+      }
     }
   }
   const { error: signupError } = await supabase.auth.signUp(data);
 
   if (signupError) {
-    // Log detailed error information
     console.error('Signup Error Details:', {
       code: signupError.code,
       message: signupError.message,
@@ -59,7 +57,7 @@ export async function signup(formData: FormData): Promise<AuthResult> {
     return { success: false, error: signupError.message }
   }
 
-  redirect('/home') // Redirect straight to dashboard after signup
+  redirect('/home') // Redirect straight to dashboard
   return { success: true }
 } 
 
