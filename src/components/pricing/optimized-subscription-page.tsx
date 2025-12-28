@@ -281,14 +281,12 @@ export function OptimizedSubscriptionPage({ initialProfile }: OptimizedSubscript
                 </div>
                 
                 <div className="mb-4">
-                  <span className="text-4xl font-bold text-gray-900">$30</span>
+                  <span className="text-4xl font-bold text-gray-900">$0</span>
                   <span className="text-gray-600">/month</span>
                 </div>
                 
                 {!isPro && (
                   <div className="space-y-2 text-sm text-gray-600">
-                    <p>💰 <strong>Pays for itself</strong> with one interview</p>
-                    <p>⏰ Less than one lunch per month</p>
                     <p>💼 Compare: Resume writers charge $260+</p>
                   </div>
                 )}
